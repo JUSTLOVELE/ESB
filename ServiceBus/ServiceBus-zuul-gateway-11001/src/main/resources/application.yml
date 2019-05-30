@@ -1,0 +1,30 @@
+server: 
+  port: 11001
+ 
+spring: 
+  application:
+    name: microservicecloud-zuul-gateway
+ 
+eureka: 
+  client: 
+    service-url: 
+      defaultZone: http://localhost:10001/eureka  
+  instance:
+    instance-id: esb-zuul-gateway-11001.com
+    prefer-ip-address: true 
+ 
+ 
+zuul: 
+  #ignored-services: microservicecloud-dept
+  prefix: /esb
+  ignored-services: "*"
+  routes: 
+    mydept.serviceId: microservicecloud-dept #真服务名
+    mydept.path: /mydept/** #对外暴露的服务名,类似虚拟电话
+ 
+info:
+  app.name: ESB
+  company.name: www.baidu.com
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$
+
