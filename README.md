@@ -1,2 +1,2 @@
 # ESB
-不得用于商用
+Commercial use is not allowed
