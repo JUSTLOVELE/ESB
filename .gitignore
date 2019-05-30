@@ -1,0 +1,7 @@
+
+ServiceBus/ServiceBus-eureka-server-10001/target/
+ServiceBus/ServiceBus-hystrix-dashboard-12001/target/
+ServiceBus/ServiceBus-server-13001/target/
+ServiceBus/ServiceBus-zuul-gateway-11001/target/
+ServiceBus/.settings/
+ServiceBus/.project
