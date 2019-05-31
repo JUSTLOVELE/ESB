@@ -16,6 +16,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -45,6 +46,29 @@ public class MainTest extends Base{
 	}
 	
 	@Test
+	public void getTest() {
+		
+		try {
+			
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			//HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			HttpGet get = new HttpGet("http://localhost:13002/ESB/invokeAction/invokeWithJson?source=1");
+	        HttpResponse httpResponse = httpClient.execute(get);
+	        httpResponse.setHeader("Content-Type", "text/plain;charset=utf-8");
+	        String s = EntityUtils.toString(httpResponse.getEntity(), "utf-8");
+	        System.out.println(s);
+	        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		/*Map<String, Object> m = new HashMap<String, Object>();
+		m.put("param", param);*/
+		
+		
+	}
+	
+	@Test
 	public void registerWithJsonTest() {
 		
 		try {
@@ -60,7 +84,8 @@ public class MainTest extends Base{
 			String param = getJSON(map);
 			System.out.println(param);
 			CloseableHttpClient httpClient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			//HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
 			StringEntity entity = new StringEntity("param=" + param, "utf-8");
           //  entity.setContentType("application/json;charset=UTF-8");
             entity.setContentEncoding("utf-8");

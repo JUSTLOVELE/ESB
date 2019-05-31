@@ -1,6 +1,5 @@
 package com.esb.view.api;
 
-import org.apache.camel.Exchange;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,20 @@ public class InvokeAction extends Base{
 	
 	private final static Log _logger = LogFactory.getLog(InvokeAction.class);
 	
-	@RequestMapping("/invokeWithJson")
+	@RequestMapping(value="/registerWithJson", produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String registerWithJson(String param) {
+		_logger.info(param);
+		return _invokeService.registerWithJson(param);
+	}
+	
+	@RequestMapping(value = "/registerWithXML", produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String registerWithXML(String param) {
+		return _invokeService.registerWithXML(param);
+	}
+	
+	/*@RequestMapping("/invokeWithJson")
 	@ResponseBody
 	public String invokeWithJson(String param) {
 		return _invokeService.invokeWithJson(param);
@@ -37,23 +49,5 @@ public class InvokeAction extends Base{
 	@ResponseBody
 	public String invokeWithXML(String param) {
 		return _invokeService.invokeWithXML(param);
-	}
-	
-	@RequestMapping(value="/registerWithJson", produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public String registerWithJson(String param) {
-		_logger.info(param);
-		return _invokeService.registerWithJson(param);
-	}
-	
-	@RequestMapping("/registerWithXML")
-	@ResponseBody
-	public String registerWithXML(String param) {
-		return _invokeService.registerWithXML(param);
-	}
-	
-	public void HelloWolrd(Exchange ex) {
-		String data = ex.getIn().getBody(String.class);
-		System.out.println("helloworld:" + data);
-	}
+	}*/
 }

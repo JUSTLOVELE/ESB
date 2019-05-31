@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.esb.core.Base;
 import com.esb.util.Constant;
+import com.esb.util.XMLUtil;
 
 import net.sf.json.JSONObject;
 
@@ -68,6 +69,7 @@ public class InvokeService extends Base{
 		String serviceCode = json.getString(Constant.Key.SERVICE_CODE);
 		//String url = json.getString(Constant.Key.URL);
 		//int type = json.getInt(Constant.Key.TYPE);
+		param = XMLUtil.parseJSONToRegisterXMLInfo(json);
 		String path = Constant.Key.PATH_ROOT + "/" + orgCode + "/" + serviceCode;
 		
 		if(!_zookeeperService.checkExists(path)) {

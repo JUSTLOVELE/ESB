@@ -17,6 +17,8 @@ import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -92,13 +94,17 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
 				
 				ChildData childData = nodeCache.getCurrentData();
 				_logger.info("-----------ZookeeperServiceImpl.registerNodeCacheListener()--------------");
+				_logger.info("Path:" + childData.getPath());
+				String routeId = childData.getPath();
+				//把原来的路由信息删除然后新增路由
+				_camelContext.removeRoute(routeId);
 				
 				if(childData != null) {
-					_logger.info("Path:" + childData.getPath());
-					_logger.info("Stat:" + childData.getStat().toString());
-					_logger.info("Data:" + new String(childData.getData()));
+					
+					String data = new String(childData.getData());
+					Document registerXML = DocumentHelper.parseText(data);
+					registerXML.getRootElement();
 				}
-				//把原来的路由信息删除然后新增路由
 			});
 			
 			nodeCache.start();
