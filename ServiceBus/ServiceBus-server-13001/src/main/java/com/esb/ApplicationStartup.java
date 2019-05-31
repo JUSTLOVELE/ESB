@@ -1,9 +1,12 @@
 package com.esb;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.spi.Registry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -30,13 +33,44 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		startService();		
+		startService(event);		
 	}
 	
-	private  void startService() {
+	/**
+	 * 			System.out.println("BeanName:" + beanName);
+				System.out.println("Bean的类型：" + beanType);
+				System.out.println("Bean所在的包：" + beanType.getPackage());
+				System.out.println("Bean：" + app.getBean(beanName));
+	 * @param event
+	 */
+	private  void startService(ContextRefreshedEvent event) {
 		
 		try {
 			_camelContext.addRoutes(_httpPublisherRouter);
+			ApplicationContext app = event.getApplicationContext();
+			String[] beans = app.getBeanDefinitionNames();
+			Registry registry = _camelContext.getRegistry();
+			
+			for (String beanName : beans) {
+				
+				Class<?> beanType = app.getType(beanName);
+				
+				if(beanType.getPackage() != null) {
+					
+					String packageName = beanType.getPackage().getName();
+					
+					if(packageName.contains("com.esb.route.bean")){
+						
+						_logger.info(packageName);
+						registry.bind(beanName, app.getBean(beanName));
+					}
+				}
+			}
+			
+			
+			//registry.bind(id, bean);
+			
+			
 		} catch (Exception e) {
 			_logger.error("", e);
 		}

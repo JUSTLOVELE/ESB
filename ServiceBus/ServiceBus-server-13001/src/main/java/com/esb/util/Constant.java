@@ -35,6 +35,10 @@ public class Constant {
 	public interface CamelComponent{
 		public String ACTIVEMQ = "activemq";
 	}
+	
+	public interface HeadParam{
+		public String INVOKEPRIORITY = "invokePriority";
+	}
 
 
 	public interface Key{
@@ -59,9 +63,15 @@ public class Constant {
 		
 		public String TYPE = "type";
 		
+		public String KEY = "key";
+		
 		public String PARAM = "param";
 		
 		public String PARAMS = "params";
+		
+		public String POST = "POST";
+		
+		public String GET = "GET";
 	}
 	
 	//本地配置文件

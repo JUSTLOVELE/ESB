@@ -1,4 +1,4 @@
-package com.esb.service.route;
+package com.esb.route.bean;
 
 import org.apache.camel.Exchange;
 import org.apache.commons.logging.Log;
@@ -24,8 +24,9 @@ public class RouterErrorHandler {
 		_logger.info("handlerWS");
 	}
 	
-	public void handlerHttp(Exchange change) {
+	public void handlerHttp(Exchange exchange) {
 		
-		_logger.info("handlerHttp");
+		Exception exce = exchange.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class);
+		_logger.info("---RouterErrorHandler.handlerHttp,"+exce.getMessage(),exce);
 	}
 }

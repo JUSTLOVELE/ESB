@@ -1,13 +1,13 @@
-package com.esb.service.route;
+	package com.esb.service.route;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.esb.view.api.InvokeAction;
+import com.esb.service.process.HttpProcessor;
 
 /**
  * @Description:
@@ -21,8 +21,8 @@ public class HttpPublisherRouter extends RouteBuilder {
 
 	private Log _logger = LogFactory.getLog(HttpPublisherRouter.class);
 	
-/*	@Resource
-	private Endpoint invokeNormalQueueEndpointConsume;*/
+	@Autowired
+	private HttpProcessor _httpProcessor;
 	
 	/**
 	 * 
@@ -39,26 +39,12 @@ public class HttpPublisherRouter extends RouteBuilder {
 		_logger.info("----HttpPublisherRouter----");
 		
 		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttp"));
-		from(RouteUtil.invokeNormalQueueEndpointConsume).process(new Processor() {
-			
-			@Override
-			public void process(Exchange exchange) throws Exception {
-				// TODO Auto-generated method stub
-				_logger.info("direct:invokeWithJson");
-				String queryString = exchange.getIn().getHeader(Exchange.HTTP_QUERY, String.class);
-				String data = exchange.getIn().getBody(String.class);
-				System.out.println("data = " + data);
-				System.out.println("queryString = " + queryString);
-				System.out.println("out = " + exchange.getOut().toString());
-				exchange.getOut().setBody(data);
-			}
-		}).bean(InvokeAction.class, "HelloWolrd")
+		//from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(new HttpProcessor()).bean(InvokeAction.class, "HelloWolrd").end();
 		
-		//to("bean:invokeAction?method=HelloWolrd")
-		
-		.end();
-		
-		
+		from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(_httpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
+		from(RouteUtil.Direct.DIRECT_PRODUCENORMAL).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
+		from(RouteUtil.Direct.DIRECT_PRODUCEHIGH).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
+		//to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
 		/*_logger.info("----default cxf SpringBus:"+webServicePublisher.getBus());
 		
 		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerWS"));
