@@ -34,9 +34,9 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/esb?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT
-    username: root
-    password: root
+    url: jdbc:mysql://106.52.117.118:3306/esb?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT
+    username: esb
+    password: esb
     dbcp2:
       min-idle: 3
       initial-size: 3

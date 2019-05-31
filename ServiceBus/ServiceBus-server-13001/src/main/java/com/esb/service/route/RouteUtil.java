@@ -10,9 +10,9 @@ public class RouteUtil {
 	/**高速消费者**/
 	public final static String invokeHighQueueEndpointConsume = "activemq:esb.high.invokHighQueue?concurrentConsumers=10&maxConcurrentConsumers=10";
 	/**普通生产者**/
-	public final static String invokeNormalEndpointProduce = "activemq:esb.normal.invokeNormalQueue?replyToConcurrentConsumers=2&replyToMaxConcurrentConsumers=2&requestTimeout=60000";
+	public final static String invokeNormalEndpointProduce = "activemq:esb.normal.invokeNormalQueue?concurrentConsumers=2&maxConcurrentConsumers=2&requestTimeout=60000";
 	/**高速生产者**/
-	public final static String invokeHighEndpointProduce = "activemq:esb.high.invokHighQueue?replyToConcurrentConsumers=2&replyToMaxConcurrentConsumers=2&requestTimeout=60000";
+	public final static String invokeHighEndpointProduce = "activemq:esb.high.invokHighQueue?concurrentConsumers=2&maxConcurrentConsumers=2&requestTimeout=60000";
 
 	public interface Direct{
 		

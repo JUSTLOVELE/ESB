@@ -6,11 +6,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import com.esb.service.inter.InitRouteInfoService;
+import com.esb.service.route.ActivemqConsumeRouter;
 import com.esb.service.route.HttpPublisherRouter;
 
 /**
@@ -31,9 +34,22 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	@Autowired
 	private HttpPublisherRouter _httpPublisherRouter;
 	
+	@Autowired
+	private ActivemqConsumeRouter _activemqConsumeRouter;
+	
+	@Autowired
+	@Qualifier("initRouteInfoServiceImpl")
+	private InitRouteInfoService _initRouteInfoService;
+	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		startService(event);		
+		
+		startService(event);
+		startRoute();
+	}
+	
+	private void startRoute() {
+		_initRouteInfoService.initRouteWithZK("direct:esb_350000_checkVersion", "http://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1");
 	}
 	
 	/**
@@ -47,6 +63,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		
 		try {
 			_camelContext.addRoutes(_httpPublisherRouter);
+			_camelContext.addRoutes(_activemqConsumeRouter);
 			ApplicationContext app = event.getApplicationContext();
 			String[] beans = app.getBeanDefinitionNames();
 			Registry registry = _camelContext.getRegistry();
@@ -66,10 +83,6 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 					}
 				}
 			}
-			
-			
-			//registry.bind(id, bean);
-			
 			
 		} catch (Exception e) {
 			_logger.error("", e);

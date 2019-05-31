@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.esb.service.process.HttpProcessor;
 
 /**
- * @Description:
+ * @Description:监听发布的http资源
  * @Copyright: Copyright (c) 2017 HYKJ All Rights Reserved
  * @author yangzl 2019-5-16
  * @version 1.00.00
@@ -40,10 +40,10 @@ public class HttpPublisherRouter extends RouteBuilder {
 		
 		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttp"));
 		//from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(new HttpProcessor()).bean(InvokeAction.class, "HelloWolrd").end();
-		
+		//将消息推到消息队列中就完成了这个路由的使命
 		from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(_httpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
 		from(RouteUtil.Direct.DIRECT_PRODUCENORMAL).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
-		from(RouteUtil.Direct.DIRECT_PRODUCEHIGH).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
+		from(RouteUtil.Direct.DIRECT_PRODUCEHIGH).to(ExchangePattern.InOut, RouteUtil.invokeHighEndpointProduce);
 		//to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
 		/*_logger.info("----default cxf SpringBus:"+webServicePublisher.getBus());
 		

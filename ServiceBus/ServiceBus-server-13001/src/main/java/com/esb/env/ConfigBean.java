@@ -81,7 +81,7 @@ public class ConfigBean {
 			throw new RuntimeException("消息队列无初始化地址");
 		}
 		
-		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory("failover:(" + Constant.ACTIVEMQ_ADDRESS + ")");
+		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(Constant.ACTIVEMQ_ADDRESS);
 		//为camel添加schema组件
 		camelContext().addComponent(Constant.CamelComponent.ACTIVEMQ, JmsComponent.jmsComponentAutoAcknowledge(factory));
 		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();

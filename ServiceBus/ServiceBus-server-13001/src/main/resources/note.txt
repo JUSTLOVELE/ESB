@@ -1,6 +1,7 @@
 注册:
 	1.通过监听的数据完成camel的路由生成,路由id就是zookeeper的路径/root/orgCode/serviceCode
 	2.解析路由
+	3.注册完新增路由
 已完成:
 	1.监听zookeeper数据节点,目前已测试新增和更新
 	2.完成json格式注册

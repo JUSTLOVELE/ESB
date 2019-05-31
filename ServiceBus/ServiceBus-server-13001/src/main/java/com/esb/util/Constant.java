@@ -47,7 +47,9 @@ public class Constant {
 		
 		public String ZOOKEEPER_ADDRESS = "zookeeperAddress";
 		
-		public String PATH_ROOT = "/root";
+		public String PATH_ROOT = "/esb";
+		
+		public String PATH_ESB = "esb";
 		/**医院编码**/
 		public String ORG_CODE = "orgCode";
 		/**编码**/

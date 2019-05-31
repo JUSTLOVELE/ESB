@@ -5,3 +5,5 @@ ServiceBus/ServiceBus-server-13001/target/
 ServiceBus/ServiceBus-zuul-gateway-11001/target/
 ServiceBus/.settings/
 ServiceBus/.project
+ServiceBus/ServiceBus-server-13001/.settings/
+ServiceBus/ServiceBus-server-13001/.classpath

@@ -19,6 +19,12 @@ import com.esb.util.Constant;
 public class DynamicRouter {
 	
 	private final static Log _logger = LogFactory.getLog(DynamicRouter.class);
+	
+	public String selectRoute(Exchange exchange) {
+		
+		_logger.info("selectRoute");
+		return "direct:esb_350000_checkVersion";
+	}
 
 	/**
 	 * 选择优先级路由
@@ -31,6 +37,7 @@ public class DynamicRouter {
 		
 		if(invokePriority==null||invokePriority<0){
 			throw new RuntimeCamelException("invokePriority=0或空");
+			//return null;
 		}else if(invokePriority<5){
 			return RouteUtil.Direct.DIRECT_PRODUCENORMAL;
 		}else{

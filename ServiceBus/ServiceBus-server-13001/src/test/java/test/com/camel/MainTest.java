@@ -76,7 +76,7 @@ public class MainTest extends Base{
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put(Constant.Key.ORG_CODE, "350000");
 			map.put(Constant.Key.SERVICE_CODE, "checkVersion");
-			map.put(Constant.Key.URL, "http://192.168.1.151/HY-GS/mobileSystemAction/api/checkVersion?source=2");
+			map.put(Constant.Key.URL, "http://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1");
 			map.put(Constant.Key.TYPE, 1);
 			List<Map<String, Object>> params = new ArrayList<Map<String, Object>>();
 			map.put(Constant.Key.PARAMS, params);
@@ -84,8 +84,8 @@ public class MainTest extends Base{
 			String param = getJSON(map);
 			System.out.println(param);
 			CloseableHttpClient httpClient = HttpClients.createDefault();
-			//HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
-			HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
+			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
 			StringEntity entity = new StringEntity("param=" + param, "utf-8");
           //  entity.setContentType("application/json;charset=UTF-8");
             entity.setContentEncoding("utf-8");
@@ -111,18 +111,19 @@ public class MainTest extends Base{
 		
 		try {
 			RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000,  3);
-			CuratorFramework client = CuratorFrameworkFactory.newClient("192.168.1.150:2181,192.168.1.151:2181,192.168.1.2:2181", 5000,3000, retryPolicy);
+			CuratorFramework client = CuratorFrameworkFactory.newClient("106.52.117.118:2181", 5000,3000, retryPolicy);
 			client.start();
 			/*String s = new String(client.getData().forPath("/root/350000/checkVersion"));
 			System.out.println(s);*/
 			/*List<String> list = client.getChildren().forPath("/root");
 			System.out.println(list.toString());*/
 			//client.delete().deletingChildrenIfNeeded().forPath("/root/350000");
-			List<String> orglist = client.getChildren().forPath("/root");
+			List<String> orglist = client.getChildren().forPath("/esb");
+			System.out.println("********************");
 			
 			for(String org: orglist) {
 				
-				String path  = "/root" + "/" + org;
+				String path  = "/esb" + "/" + org;
 				List<String> serviceList = client.getChildren().forPath(path);
 				
 				for(String service: serviceList) {
@@ -132,7 +133,7 @@ public class MainTest extends Base{
 					System.out.println(new String(client.getData().forPath(p)));
 				}
 			}
-			
+			System.out.println("********************");
 			client.close();
 		} catch (Exception e) {
 			e.printStackTrace();

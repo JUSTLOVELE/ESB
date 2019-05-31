@@ -3,6 +3,10 @@ package com.esb.service.impl;
 import java.util.List;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.curator.RetryPolicy;
@@ -146,8 +150,9 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
 					for(String service: serviceList) {
 						//监听数据变化
 						String p = path + "/" + service;
-						_logger.info(p);
 						registerNodeCacheListener(p);
+						String routeDirect = "direct:" + Constant.Key.PATH_ESB + "_" + org + "_" + service;
+						_logger.info(routeDirect);
 					}
 				}
 				
