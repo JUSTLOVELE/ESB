@@ -60,42 +60,11 @@ public abstract class Base {
 		renderJson(httpServletResponse,getJSON(result));
 	}
 	
-	public String rederAjax(boolean success, String msg, boolean status){
-		
-		Map<String, Object> displayMap = new HashMap<String, Object>();
-		displayMap.put("success", success);
-		displayMap.put("msg", msg);
-		displayMap.put("status", status);
-		String json = getJSON(displayMap);
-		clearMap(displayMap);
-		return json;
-	}
 	
 	@SuppressWarnings("rawtypes")
 	public void clearMap(Map map){
 		map.clear();
 		map = null;
-	}
-	
-	public String renderResult(Object result, boolean flag) {
-		
-		Map<String, Object> displayMap = new HashMap<String, Object>();
-		displayMap.put("success", flag);
-		displayMap.put("result", result);
-		String json = getJSON(displayMap);
-		clearMap(displayMap);
-		
-		return json;
-	}
-	
-	public String rederAjax(boolean success, String msg){
-		
-		Map<String, Object> displayMap = new HashMap<String, Object>();
-		displayMap.put("success", success);
-		displayMap.put("msg", msg);
-		String json = getJSON(displayMap);
-		clearMap(displayMap);
-		return json;
 	}
 	
 	public String getJSON(Object obj) {

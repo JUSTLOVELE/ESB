@@ -1,4 +1,4 @@
-package com.esb.service.inter;
+package com.esb.service;
 
 /**
  * @Description:初始化路由

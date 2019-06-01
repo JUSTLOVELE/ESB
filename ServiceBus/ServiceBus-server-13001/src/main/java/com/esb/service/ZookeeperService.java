@@ -1,4 +1,4 @@
-package com.esb.service.inter;
+package com.esb.service;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.NodeCache;
