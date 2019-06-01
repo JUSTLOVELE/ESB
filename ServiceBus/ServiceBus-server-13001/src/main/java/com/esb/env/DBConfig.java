@@ -55,7 +55,7 @@ public class DBConfig {
 
 		LocalSessionFactoryBean sfb = new LocalSessionFactoryBean();
 		sfb.setDataSource(druid());
-		sfb.setPackagesToScan(new String[] { "com.hy.esb.entity" });
+		sfb.setPackagesToScan(new String[] { "com.esb.entity" });
 		Properties props = new Properties();
 		props.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
 		props.setProperty("hibernate.show_sql", "true");

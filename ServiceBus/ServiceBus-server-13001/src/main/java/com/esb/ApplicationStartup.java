@@ -12,7 +12,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import com.esb.service.inter.InitRouteInfoService;
+import com.esb.service.InitRouteInfoService;
 import com.esb.service.route.ActivemqConsumeRouter;
 import com.esb.service.route.HttpPublisherRouter;
 
@@ -78,7 +78,6 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 					
 					if(packageName.contains("com.esb.route.bean")){
 						
-						_logger.info(packageName);
 						registry.bind(beanName, app.getBean(beanName));
 					}
 				}

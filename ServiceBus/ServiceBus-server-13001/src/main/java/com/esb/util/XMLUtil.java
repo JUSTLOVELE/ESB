@@ -17,6 +17,18 @@ public class XMLUtil {
 
 	private final static Log _logger = LogFactory.getLog(XMLUtil.class);
 	
+	public static String errorReturn(String msg) {
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("<root>");
+		sb.append("<code>101</code>");
+		sb.append("<success>false</success>");
+		sb.append("<data><![CDATA[" + msg + "]]></data>");
+		sb.append("</root>");
+		
+		return sb.toString();
+	}
+	
 	/**
 	 * 把json格式的注册信息转换为XML文本
 	 * @param json

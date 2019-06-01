@@ -1,8 +1,5 @@
 package com.esb.service.route;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Message;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +18,8 @@ public class ActivemqConsumeRouter extends RouteBuilder{
 	@Override
 	public void configure() throws Exception {
 		
-		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttp"));
-		from(RouteUtil.invokeNormalQueueEndpointConsume).dynamicRouter(method(DynamicRouter.class, "selectRoute"));
+		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerActivemqConsumeRouter"));
+		from(RouteUtil.invokeNormalQueueEndpointConsume).routeId(Constant.RouteId.CONSUME_ACTIVEMQ_NORMAL).dynamicRouter(method(DynamicRouter.class, "selectRoute"));
 		//from(RouteUtil.invokeHighQueueEndpointConsume);
 	}
 

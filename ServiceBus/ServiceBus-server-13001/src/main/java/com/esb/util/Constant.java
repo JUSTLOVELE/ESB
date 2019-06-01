@@ -6,8 +6,6 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.esb.InitStartComponent;
-
 /**
  * @Description:常熟类
  * @Copyright: Copyright (c) 2017 HYKJ All Rights Reserved
@@ -41,8 +39,21 @@ public class Constant {
 		public String INVOKEPRIORITY = "invokePriority";
 		/**是否被调用**/
 		public String IS_INVOKE = "isInvoke";
-		
+		/**状态**/
 		public int END_QUEUE = -100;
+	}
+	
+	public interface RouteId {
+		/**http请求来后的路由,消息格式為json**/
+		public String HTTP_START_JSON_ID = "http_start_json_id";
+		/**http请求来后的路由,消息格式為xml**/
+		public String HTTP_START_XML_ID = "http_start_xml_id";
+		/**生产者普通队列**/
+		public String PRODUCE_ACTIVEMQ_NORMAL = "produce_activemq_normal";
+		/**生产者高速队列**/
+		public String PRODUCE_ACTIVEMQ_HIGH = "produce_activemq_high";
+		/**消费者普通队列**/
+		public String CONSUME_ACTIVEMQ_NORMAL = "consume_activemq_normal";
 	}
 
 
@@ -79,6 +90,14 @@ public class Constant {
 		public String POST = "POST";
 		
 		public String GET = "GET";
+		
+		public String JSON = "json";
+		
+		public String XML = "xml";
+		
+		public String DATA = "data";
+		
+		public String OFFLINE = "offline";
 	}
 	
 	//本地配置文件

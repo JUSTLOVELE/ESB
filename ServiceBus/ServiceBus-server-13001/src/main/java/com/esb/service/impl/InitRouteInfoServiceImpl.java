@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.esb.service.inter.InitRouteInfoService;
+import com.esb.service.InitRouteInfoService;
 import com.esb.util.Constant;
 
 /**

@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.esb.core.Base;
-import com.esb.service.inter.ZookeeperService;
+import com.esb.service.ZookeeperService;
 import com.esb.util.Constant;
 
 /**

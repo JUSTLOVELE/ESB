@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.esb.service.process.StartHttpProcessor;
+import com.esb.util.Constant;
 
 /**
  * @Description:监听发布的http资源
@@ -38,12 +39,13 @@ public class HttpPublisherRouter extends RouteBuilder {
 		
 		_logger.info("----HttpPublisherRouter----");
 		
-		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttp"));
+		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttpPublisherRouter"));
 		//from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(new HttpProcessor()).bean(InvokeAction.class, "HelloWolrd").end();
 		//将消息推到消息队列中就完成了这个路由的使命
-		from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(_startHttpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
-		from(RouteUtil.Direct.DIRECT_PRODUCENORMAL).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
-		from(RouteUtil.Direct.DIRECT_PRODUCEHIGH).to(ExchangePattern.InOut, RouteUtil.invokeHighEndpointProduce);
+		from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).routeId(Constant.RouteId.HTTP_START_JSON_ID).process(_startHttpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
+		from(RouteUtil.HTTP_INVOKE_XML_ADDRESS).routeId(Constant.RouteId.HTTP_START_XML_ID).process(_startHttpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
+		from(RouteUtil.Direct.DIRECT_PRODUCENORMAL).routeId(Constant.RouteId.PRODUCE_ACTIVEMQ_NORMAL).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
+		from(RouteUtil.Direct.DIRECT_PRODUCEHIGH).routeId(Constant.RouteId.PRODUCE_ACTIVEMQ_HIGH).to(ExchangePattern.InOut, RouteUtil.invokeHighEndpointProduce);
 		//to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
 		/*_logger.info("----default cxf SpringBus:"+webServicePublisher.getBus());
 		
