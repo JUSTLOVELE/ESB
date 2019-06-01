@@ -20,11 +20,11 @@ import com.esb.util.Constant;
  * @history:
  */
 @Component
-public class HttpProcessor implements Processor{
+public class StartHttpProcessor implements Processor{
 	
-	private final static Log _logger = LogFactory.getLog(HttpProcessor.class);
+	private final static Log _logger = LogFactory.getLog(StartHttpProcessor.class);
 	
-	public HttpProcessor() {
+	public StartHttpProcessor() {
 		
 	}
 
@@ -50,6 +50,7 @@ public class HttpProcessor implements Processor{
 		
 		//因为没有做用户的等级所有固定放1,意味着只走普通队列
 		in.getHeaders().put(Constant.HeadParam.INVOKEPRIORITY, 1);
+		in.getHeaders().put(Constant.HeadParam.IS_INVOKE, Boolean.valueOf(false));
 		_logger.info(("data = " + data));
 		
 		/*Message in = exchange.getIn();
