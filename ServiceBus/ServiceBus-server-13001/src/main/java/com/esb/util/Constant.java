@@ -37,7 +37,12 @@ public class Constant {
 	}
 	
 	public interface HeadParam{
+		/**优先级**/
 		public String INVOKEPRIORITY = "invokePriority";
+		/**是否被调用**/
+		public String IS_INVOKE = "isInvoke";
+		
+		public int END_QUEUE = -100;
 	}
 
 

@@ -1,6 +1,6 @@
 注册:
 	1.通过监听的数据完成camel的路由生成,路由id就是zookeeper的路径/root/orgCode/serviceCode
-	2.解决动态路由一直调用问题,设计其调用一次后返回null即可不在被调用
+	3.errorhandle不同的路由要设计不同的方法
 已完成:
 	1.监听zookeeper数据节点,目前已测试新增和更新
 	2.完成json格式注册

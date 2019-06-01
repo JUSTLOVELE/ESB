@@ -1,7 +1,10 @@
 package com.esb.service.route;
 
+import java.util.Map;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
+import org.apache.camel.Message;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,8 +25,22 @@ public class DynamicRouter {
 	
 	public String selectRoute(Exchange exchange) {
 		
-		_logger.info("selectRoute");
-		return "direct:esb_350000_checkVersion";
+		Message in = exchange.getIn();
+		Map<String, Object> head = in.getHeaders();
+		
+		for (Map.Entry<String, Object> entry : head.entrySet()) { 
+			  System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue()); 
+		}
+		
+		Boolean isInvoke = (Boolean) head.get(Constant.HeadParam.IS_INVOKE);
+		
+		if(!isInvoke) {
+			_logger.info("selectRoute");
+			return "direct:esb_350000_checkVersion";
+		}else {
+			_logger.info("selectRoute is end");
+			return null;
+		}
 	}
 
 	/**
@@ -35,13 +52,16 @@ public class DynamicRouter {
 	//通过@Header(SystemConstant.HEADER_NAME_INVOKE_PRIORITY)Integer invokePriority 可以访问头参数的数据
 	public String routeByPriority(Exchange exchange, @Header(Constant.HeadParam.INVOKEPRIORITY) Integer invokePriority){
 		
-		if(invokePriority==null||invokePriority<0){
-			throw new RuntimeCamelException("invokePriority=0或空");
-			//return null;
-		}else if(invokePriority<5){
-			return RouteUtil.Direct.DIRECT_PRODUCENORMAL;
-		}else{
+		if(invokePriority==null) {
+			throw new RuntimeCamelException("invokePriority未知=" + invokePriority);
+		}else if(invokePriority > 5) {
 			return RouteUtil.Direct.DIRECT_PRODUCEHIGH;
+		}else if(invokePriority<5 && invokePriority>0) {
+			return RouteUtil.Direct.DIRECT_PRODUCENORMAL;
+		}else if(invokePriority == Constant.HeadParam.END_QUEUE) {
+			return null;
+		}else {
+			throw new RuntimeCamelException("invokePriority未知=" + invokePriority);
 		}
 	}
 }

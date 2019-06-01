@@ -7,7 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.esb.service.process.HttpProcessor;
+import com.esb.service.process.StartHttpProcessor;
 
 /**
  * @Description:监听发布的http资源
@@ -22,7 +22,7 @@ public class HttpPublisherRouter extends RouteBuilder {
 	private Log _logger = LogFactory.getLog(HttpPublisherRouter.class);
 	
 	@Autowired
-	private HttpProcessor _httpProcessor;
+	private StartHttpProcessor _startHttpProcessor;
 	
 	/**
 	 * 
@@ -41,7 +41,7 @@ public class HttpPublisherRouter extends RouteBuilder {
 		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttp"));
 		//from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(new HttpProcessor()).bean(InvokeAction.class, "HelloWolrd").end();
 		//将消息推到消息队列中就完成了这个路由的使命
-		from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(_httpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
+		from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(_startHttpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
 		from(RouteUtil.Direct.DIRECT_PRODUCENORMAL).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
 		from(RouteUtil.Direct.DIRECT_PRODUCEHIGH).to(ExchangePattern.InOut, RouteUtil.invokeHighEndpointProduce);
 		//to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);

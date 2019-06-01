@@ -3,6 +3,7 @@ package com.esb.service.impl;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
+import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.esb.service.inter.InitRouteInfoService;
+import com.esb.util.Constant;
 
 /**
  * @Description:初始化路由
@@ -50,11 +52,17 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 						@Override
 						public void process(Exchange exchange) throws Exception {
 							
+							Message in = exchange.getIn();
+							//是否被调用过
+							in.getHeader(Constant.HeadParam.IS_INVOKE, Boolean.valueOf(true));
 							String data = exchange.getIn().getBody(String.class);
 							_logger.info("data = " + data);
 							String outData = exchange.getOut().getBody(String.class);
+							Message out = exchange.getOut();
+							out.getHeaders().put(Constant.HeadParam.INVOKEPRIORITY, Constant.HeadParam.END_QUEUE);
+							out.getHeaders().put(Constant.HeadParam.IS_INVOKE, Boolean.valueOf(true));
 							_logger.info("outData = " + outData);
-							exchange.getOut().setBody("hello world");
+							exchange.getOut().setBody(data);
 							
 						}
 					}).end()

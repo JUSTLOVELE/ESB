@@ -1,7 +1,12 @@
 package com.esb.service.route;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
+
+import com.esb.util.Constant;
 
 /**
  * @Description:动态路由
