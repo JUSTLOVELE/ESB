@@ -1,7 +1,12 @@
 package com.esb.util;
 
+import java.io.StringReader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -17,6 +22,29 @@ public class XMLUtil {
 
 	private final static Log _logger = LogFactory.getLog(XMLUtil.class);
 	
+	/**
+	 * 获取xml的根对象
+	 * @param xml
+	 * @return
+	 */
+	public static Element getRootElement(String xml) {
+		
+		try {
+			SAXBuilder sax = new SAXBuilder();
+			Document doc = sax.build(new StringReader(xml));
+			return doc.getRootElement();
+		} catch (Exception e) {
+			_logger.error("", e);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 返回错误信息
+	 * @param msg
+	 * @return
+	 */
 	public static String errorReturn(String msg) {
 		
 		StringBuffer sb = new StringBuffer();

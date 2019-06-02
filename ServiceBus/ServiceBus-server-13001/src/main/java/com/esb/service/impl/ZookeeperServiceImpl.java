@@ -99,16 +99,16 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
 				ChildData childData = nodeCache.getCurrentData();
 				_logger.info("-----------ZookeeperServiceImpl.registerNodeCacheListener()--------------");
 				_logger.info("Path:" + childData.getPath());
-				String routeId = childData.getPath();
-				//把原来的路由信息删除然后新增路由
-				_camelContext.removeRoute(routeId);
-				
-				if(childData != null) {
-					
-					String data = new String(childData.getData());
-					Document registerXML = DocumentHelper.parseText(data);
-					registerXML.getRootElement();
-				}
+//				String routeId = childData.getPath();
+//				//把原来的路由信息删除然后新增路由
+//				_camelContext.removeRoute(routeId);
+//				
+//				if(childData != null) {
+//					
+//					String data = new String(childData.getData());
+//					Document registerXML = DocumentHelper.parseText(data);
+//					registerXML.getRootElement();
+//				}
 			});
 			
 			nodeCache.start();

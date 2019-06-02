@@ -98,6 +98,8 @@ public class Constant {
 		public String DATA = "data";
 		
 		public String OFFLINE = "offline";
+		
+		public String VALUE = "value";
 	}
 	
 	//本地配置文件

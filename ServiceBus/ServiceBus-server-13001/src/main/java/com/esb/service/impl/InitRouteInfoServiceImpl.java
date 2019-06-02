@@ -71,9 +71,6 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 				}
 			});
 			
-			System.out.println("cacacaa");
-			Route r = _camelContext.getRoute("test");
-			System.out.println(r.toString());
 		} catch (Exception e) {
 			_logger.error("", e);
 		}
