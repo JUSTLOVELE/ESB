@@ -66,8 +66,8 @@ public class Constant {
 		public String PATH_ROOT = "/esb";
 		
 		public String PATH_ESB = "esb";
-		/**医院编码**/
-		public String ORG_CODE = "orgCode";
+		/**站点编码**/
+		public String SITE_CODE = "siteCode";
 		/**编码**/
 		public String CODE = "code";
 		
@@ -85,6 +85,10 @@ public class Constant {
 		
 		public String PARAM = "param";
 		
+		public String ESB_HEAD_INVOKE = "esbHeadInvoke";
+		
+		public String ESB_HEAD_REGISTER = "esbHeadRegister";
+		
 		public String PARAMS = "params";
 		
 		public String POST = "POST";
@@ -100,6 +104,10 @@ public class Constant {
 		public String OFFLINE = "offline";
 		
 		public String VALUE = "value";
+		/**选择优先级队列动态路由调用次数**/
+		public String COUNT_INVOKEPRIORITY = "countInvokePriority";
+		/**选择站点动态路由调用次数**/
+		public String COUNT_SELECT_SITE = "countSelectSite";
 	}
 	
 	//本地配置文件

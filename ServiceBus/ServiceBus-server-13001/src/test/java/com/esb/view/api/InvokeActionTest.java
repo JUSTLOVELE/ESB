@@ -25,7 +25,7 @@ public class InvokeActionTest extends Base{
 	public void registerWithJsonTest() {
 		
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(Constant.Key.ORG_CODE, "350000");
+		map.put(Constant.Key.SITE_CODE, "350000");
 		map.put(Constant.Key.SERVICE_CODE, "checkVersion");
 		map.put(Constant.Key.URL, "http://192.168.1.151/HY-GS/mobileSystemAction/api/checkVersion?source=1");
 		map.put(Constant.Key.TYPE, 1);

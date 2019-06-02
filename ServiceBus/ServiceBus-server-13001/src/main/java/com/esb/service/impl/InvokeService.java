@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.esb.core.Base;
+import com.esb.sys.ZookeeperOperation;
 import com.esb.util.Constant;
 import com.esb.util.XMLUtil;
 
@@ -49,8 +50,8 @@ public class InvokeService extends Base{
 		
 		JSONObject json = JSONObject.fromObject(param);
 		
-		if(!json.containsKey(Constant.Key.ORG_CODE)) {
-			return returnErrorCode("orgCode为必填项目");
+		if(!json.containsKey(Constant.Key.SITE_CODE)) {
+			return returnErrorCode("siteCode为必填项目");
 		}
 		
 		if(!json.containsKey(Constant.Key.SERVICE_CODE)) {
@@ -65,12 +66,12 @@ public class InvokeService extends Base{
 			return returnErrorCode("param为必填");
 		}
 		
-		String orgCode = json.getString(Constant.Key.ORG_CODE);
+		String siteCode = json.getString(Constant.Key.SITE_CODE);
 		String serviceCode = json.getString(Constant.Key.SERVICE_CODE);
 		//String url = json.getString(Constant.Key.URL);
 		//int type = json.getInt(Constant.Key.TYPE);
 		param = XMLUtil.parseJSONToRegisterXMLInfo(json);
-		String path = Constant.Key.PATH_ROOT + "/" + orgCode + "/" + serviceCode;
+		String path = Constant.Key.PATH_ROOT + "/" + siteCode + "/" + serviceCode;
 		
 		if(!_zookeeperService.checkExists(path)) {
 			

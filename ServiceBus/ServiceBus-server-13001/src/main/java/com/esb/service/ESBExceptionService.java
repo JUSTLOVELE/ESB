@@ -12,4 +12,6 @@ import com.esb.entity.EsbExceptionEntity;
 public interface ESBExceptionService {
 
 	public void saveESBExceptionEntity(EsbExceptionEntity e);
+	
+	public void saveESBExceptionEntity(String id, String routeId, String key, String uri, String errorMsg, String siteCode, String serviceCode);
 }

@@ -1,19 +1,26 @@
 package com.esb.service.impl;
 
+import java.util.Map;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
-import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.esb.service.InitRouteInfoService;
+import com.esb.service.process.EndRouteProcessor;
+import com.esb.service.process.LastHttpRouteProcessor;
+import com.esb.sys.RegisterType;
 import com.esb.util.Constant;
+import com.esb.util.XMLUtil;
+import com.netflix.discovery.converters.Auto;
 
 /**
  * @Description:初始化路由
@@ -28,48 +35,66 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 	@Autowired
 	private CamelContext _camelContext;
 	
+	@Autowired
+	private EndRouteProcessor _endRouteProcessor;
+	
+	@Autowired
+	private LastHttpRouteProcessor _lastHttpRouteProcessor;
+	
 	private final static Log _logger = LogFactory.getLog(InitRouteInfoServiceImpl.class);
 
 	@Override
-	public boolean initRouteWithZK(String direct, String endpoint) {
+	public boolean initRouteWithZK(String path, String data) {
 		
 		try {
-			_camelContext.addRoutes(new RouteBuilder() {
+			
+			path = path.substring(1, path.length());
+			String [] p = path.split("/");
+			String root = p[0];
+			String siteCode = p[1];
+			String serviceCode = p[2];
+			String route = "direct:" + root + "_" + siteCode + "_" + serviceCode;
+			String routeId = root + "_" + siteCode + "_" + serviceCode;
+			_logger.info(route);
+			//把原来的路由信息删除然后新增路由
+			_camelContext.removeRoute(route);
+			Map<String, Object> registerInfo = XMLUtil.getReigsterInfo(data);
+			Integer type = (Integer) registerInfo.get(Constant.Key.TYPE);
+			String url = (String) registerInfo.get(Constant.Key.URL);
+			
+			switch (RegisterType.getValue(type)) {
+			case HTTP:
 				
-				@Override
-				public void configure() throws Exception {
+				_camelContext.addRoutes(new RouteBuilder() {
 					
-					errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttp"));
-					from("direct:esb_350000_checkVersion").routeId("test").process(new Processor() {
+					@Override
+					public void configure() throws Exception {
 						
-						@Override
-						public void process(Exchange exchange) throws Exception {
-							_logger.info("----route = " + direct + "--------------ß");
-						}
-					}).to(ExchangePattern.InOut, "http4://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1&bridgeEndpoint=true&throwExceptionOnFailure=false")
-					.process(new Processor() {
-						
-						@Override
-						public void process(Exchange exchange) throws Exception {
-							
-							Message in = exchange.getIn();
-							//是否被调用过
-							in.getHeader(Constant.HeadParam.IS_INVOKE, Boolean.valueOf(true));
-							String data = exchange.getIn().getBody(String.class);
-							_logger.info("data = " + data);
-							String outData = exchange.getOut().getBody(String.class);
-							Message out = exchange.getOut();
-							out.getHeaders().put(Constant.HeadParam.INVOKEPRIORITY, Constant.HeadParam.END_QUEUE);
-							out.getHeaders().put(Constant.HeadParam.IS_INVOKE, Boolean.valueOf(true));
-							_logger.info("outData = " + outData);
-							exchange.getOut().setBody(data);
-							
-						}
-					}).end()
-					
-					;
-				}
-			});
+						errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttpSiteRoute"));
+						from(route).routeId(routeId)
+						.process(_lastHttpRouteProcessor)
+						//.to(ExchangePattern.InOut, "http4://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1&bridgeEndpoint=true&throwExceptionOnFailure=false")
+						.to(ExchangePattern.InOut, "http4://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1&bridgeEndpoint=true&throwExceptionOnFailure=false")
+						.process(_endRouteProcessor).end();
+					}
+				});
+				break;
+				
+			case WEBSERVICE:
+				break;
+				
+			case FILE:
+				break;
+				
+			case COMPLEX:
+				break;
+				
+			case MESSAGE_SEND:
+				break;
+
+			default:
+				break;
+			}
 			
 		} catch (Exception e) {
 			_logger.error("", e);

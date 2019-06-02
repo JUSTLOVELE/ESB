@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.esb.dao.ESBExceptionDao;
 import com.esb.entity.EsbExceptionEntity;
 import com.esb.service.ESBExceptionService;
+import com.esb.util.UUIDUtil;
 
 /**
  * @Description:
@@ -27,6 +28,13 @@ public class ESBExceptionServiceImpl implements ESBExceptionService {
 	@Override
 	public void saveESBExceptionEntity(EsbExceptionEntity e) {
 		_eSBExceptionDao.saveESBExceptionEntity(e);		
+	}
+
+	@Override
+	public void saveESBExceptionEntity(String id, String routeId, String key, String uri, String errorMsg,
+			String siteCode, String serviceCode) {
+		EsbExceptionEntity entity = new EsbExceptionEntity(UUIDUtil.getUUID(), routeId, key, uri, null, errorMsg, siteCode, serviceCode);
+		saveESBExceptionEntity(entity);
 	}
 
 }

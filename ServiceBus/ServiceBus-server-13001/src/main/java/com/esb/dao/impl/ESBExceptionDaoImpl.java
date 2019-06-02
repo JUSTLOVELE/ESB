@@ -28,11 +28,21 @@ public class ESBExceptionDaoImpl extends BaseDao implements ESBExceptionDao {
 		 
 		StringBuffer sb = new StringBuffer();
 		sb.append("insert into esb_exception_tbl ");
-		sb.append("(create_date, endpoint_key, endpoint_uri, exception_msg, route_id, op_id)");
-		sb.append("values (str_to_date(?, '%Y-%m-%d %H:%i:%s'), ?, ?, ?, ?, ?)");
+		sb.append("(create_date, endpoint_key, endpoint_uri, exception_msg, route_id, op_id, site_code, service_code)");
+		sb.append("values (str_to_date(?, '%Y-%m-%d %H:%i:%s'), ?, ?, ?, ?, ?, ?, ?)");
 		String sql = sb.toString();
 		_logger.info(sql);
-		this.getJdbcTemplate().update(sql, new Object[] {DateUtil.parseDateToStr(new Date(), DateUtil.DATE_TIME_FORMAT_YYYY_MM_DD_HH_MI_SS), e.getEndpointKey(), e.getEndpointUri(), e.getExceptionMsg(), e.getRouteId(), e.getOpId()});
+		this.getJdbcTemplate().update(sql, new Object[] {DateUtil.parseDateToStr(new Date(), 
+				DateUtil.DATE_TIME_FORMAT_YYYY_MM_DD_HH_MI_SS), 
+				e.getEndpointKey(), 
+				e.getEndpointUri(), 
+				e.getExceptionMsg(), 
+				e.getRouteId(), 
+				e.getOpId(),
+				e.getSiteCode(),
+				e.getServiceCode()
+		});
+		
 		//save(e);
 	}
 

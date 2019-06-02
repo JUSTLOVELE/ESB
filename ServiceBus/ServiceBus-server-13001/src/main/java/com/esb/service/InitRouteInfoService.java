@@ -9,5 +9,5 @@ package com.esb.service;
  */
 public interface InitRouteInfoService {
 
-	public boolean initRouteWithZK(String direct, String endpoint);
+	public boolean initRouteWithZK(String path, String data);
 }

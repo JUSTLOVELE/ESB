@@ -74,7 +74,7 @@ public class MainTest extends Base{
 		try {
 			
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put(Constant.Key.ORG_CODE, "350000");
+			map.put(Constant.Key.SITE_CODE, "350000");
 			map.put(Constant.Key.SERVICE_CODE, "checkVersion");
 			map.put(Constant.Key.URL, "http://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1");
 			map.put(Constant.Key.TYPE, 1);
@@ -137,6 +137,18 @@ public class MainTest extends Base{
 			client.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void getPath() {
+		
+		String path = "/esb/350000/checkversion";
+		path = path.substring(1, path.length());
+		String [] p = path.split("/");
+		System.out.println(p.length);
+		for(String s : p) {
+			System.out.println(s);
 		}
 	}
 	

@@ -1,29 +1,41 @@
 package com.esb.sys;
 
 /**
- * @Description:zookeeper操作枚举
+ * @Description:注册类型枚举
  * @Copyright: Copyright (c) 2017 HYKJ All Rights Reserved
  * @author yangzl 2019-6-2
  * @version 1.00.00
  * @history:
  */
-public enum ZookeeperOperation {
+public enum RegisterType {
 
-	ADD(0, "新增"),
-	DELETE(1, "删除"),
-	EDIT(2, "修改"),
-	UPDATE(3, "更新"),
-	INIT(4,"初始化")
+	HTTP(1, "HTTP"),
+	WEBSERVICE(2, "webservice"),
+	FILE(3, "file"),
+	COMPLEX(4, "复合请求"),
+	MESSAGE_SEND(5, "消息分发")
 	;
-	
 	private int value;
 	
 	private String text;
 	
-	ZookeeperOperation(int value, String text){
-	
+	RegisterType(int value, String text){
+		
 		this.value = value;
 		this.text = text;
+	}
+	
+
+	public static RegisterType getValue(int v) {
+		
+		for(RegisterType r: values()) {
+			
+			if(r.getValue() == v) {
+				return r;
+			}
+		}
+		
+		return null;
 	}
 
 	public int getValue() {

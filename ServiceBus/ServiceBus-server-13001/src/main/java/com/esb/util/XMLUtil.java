@@ -1,6 +1,10 @@
 package com.esb.util;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,6 +26,39 @@ public class XMLUtil {
 
 	private final static Log _logger = LogFactory.getLog(XMLUtil.class);
 	
+	public static Map<String, Object> getReigsterInfo(String xml){
+		
+		Element root = getRootElement(xml);
+		Element siteCodeElement = root.getChild(Constant.Key.SITE_CODE);
+		Element serviceCodeElement = root.getChild(Constant.Key.SERVICE_CODE);
+		Element urlElement = root.getChild(Constant.Key.URL);
+		Element typeElement = root.getChild(Constant.Key.TYPE);
+		List<Element> paramElements = root.getChildren(Constant.Key.PARAM);
+		List<Map<String, Object>> params = null;
+		
+		if(paramElements != null && paramElements.size() > 0) {
+			
+			params = new ArrayList<Map<String, Object>>();
+			
+			for(Element param: paramElements) {
+				
+				Map<String, Object> m = new HashMap<String, Object>();
+				m.put(Constant.Key.TYPE, Integer.valueOf(param.getChild(Constant.Key.TYPE).getValue()));
+				m.put(Constant.Key.KEY, param.getChild(Constant.Key.KEY).getValue());
+				params.add(m);
+			}
+		}
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(Constant.Key.SITE_CODE, siteCodeElement.getValue());
+		map.put(Constant.Key.SERVICE_CODE, serviceCodeElement.getValue());
+		map.put(Constant.Key.URL, urlElement.getValue());
+		map.put(Constant.Key.TYPE, Integer.valueOf(typeElement.getValue()));
+		map.put(Constant.Key.PARAM, params);
+		
+		return map;
+	}
+	 
 	/**
 	 * 获取xml的根对象
 	 * @param xml
@@ -66,7 +103,7 @@ public class XMLUtil {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("<root>");
-		sb.append("<orgCode><![CDATA[" + json.getString(Constant.Key.ORG_CODE) + "]]></orgCode>");
+		sb.append("<orgCode><![CDATA[" + json.getString(Constant.Key.SITE_CODE) + "]]></orgCode>");
 		sb.append("<serviceCode><![CDATA[" + json.getString(Constant.Key.SERVICE_CODE) + "]]></serviceCode>");
 		sb.append("<url><![CDATA[" + json.getString(Constant.Key.URL) + "]]></url>");
 		sb.append("<type><![CDATA[" + json.getInt(Constant.Key.TYPE) + "]]></type>");

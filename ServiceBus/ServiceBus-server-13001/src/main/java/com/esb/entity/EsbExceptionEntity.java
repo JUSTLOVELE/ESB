@@ -44,12 +44,18 @@ public class EsbExceptionEntity {
 	@Column(name = "exception_msg", length = 1024)
 	private String exceptionMsg;
 	
+	@Column(name = "site_code", length = 64)
+	private String siteCode;
+	
+	@Column(name = "service_code", length = 64)
+	private String serviceCode;
+	
 	public EsbExceptionEntity() {
 		
 	}
 
 	public EsbExceptionEntity(String opId, String routeId, String endpointKey, String endpointUri, Date createDate,
-			String exceptionMsg) {
+			String exceptionMsg, String siteCode, String serviceCode) {
 		super();
 		this.opId = opId;
 		this.routeId = routeId;
@@ -57,6 +63,8 @@ public class EsbExceptionEntity {
 		this.endpointUri = endpointUri;
 		this.createDate = createDate;
 		this.exceptionMsg = exceptionMsg;
+		this.siteCode = siteCode;
+		this.serviceCode = serviceCode;
 	}
 
 	public String getOpId() {
@@ -105,5 +113,21 @@ public class EsbExceptionEntity {
 
 	public void setExceptionMsg(String exceptionMsg) {
 		this.exceptionMsg = exceptionMsg;
+	}
+
+	public String getSiteCode() {
+		return siteCode;
+	}
+
+	public void setSiteCode(String siteCode) {
+		this.siteCode = siteCode;
+	}
+
+	public String getServiceCode() {
+		return serviceCode;
+	}
+
+	public void setServiceCode(String serviceCode) {
+		this.serviceCode = serviceCode;
 	}
 }

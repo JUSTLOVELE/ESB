@@ -23,6 +23,9 @@ public class HttpPublisherRouter extends RouteBuilder {
 	private Log _logger = LogFactory.getLog(HttpPublisherRouter.class);
 	
 	@Autowired
+	private DynamicRouter _dynamicRouter;
+	
+	@Autowired
 	private StartHttpProcessor _startHttpProcessor;
 	
 	/**
@@ -42,8 +45,8 @@ public class HttpPublisherRouter extends RouteBuilder {
 		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttpPublisherRouter"));
 		//from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).process(new HttpProcessor()).bean(InvokeAction.class, "HelloWolrd").end();
 		//将消息推到消息队列中就完成了这个路由的使命
-		from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).routeId(Constant.RouteId.HTTP_START_JSON_ID).process(_startHttpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
-		from(RouteUtil.HTTP_INVOKE_XML_ADDRESS).routeId(Constant.RouteId.HTTP_START_XML_ID).process(_startHttpProcessor).dynamicRouter(method(DynamicRouter.class, "routeByPriority"));
+		from(RouteUtil.HTTP_INVOKE_JSON_ADDRESS).routeId(Constant.RouteId.HTTP_START_JSON_ID).process(_startHttpProcessor).dynamicRouter(method(_dynamicRouter, "routeByPriority"));
+		from(RouteUtil.HTTP_INVOKE_XML_ADDRESS).routeId(Constant.RouteId.HTTP_START_XML_ID).process(_startHttpProcessor).dynamicRouter(method(_dynamicRouter, "routeByPriority"));
 		from(RouteUtil.Direct.DIRECT_PRODUCENORMAL).routeId(Constant.RouteId.PRODUCE_ACTIVEMQ_NORMAL).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
 		from(RouteUtil.Direct.DIRECT_PRODUCEHIGH).routeId(Constant.RouteId.PRODUCE_ACTIVEMQ_HIGH).to(ExchangePattern.InOut, RouteUtil.invokeHighEndpointProduce);
 		//to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);

@@ -2,11 +2,6 @@ package com.esb.service.impl;
 
 import java.util.List;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
-import org.apache.camel.Processor;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.curator.RetryPolicy;
@@ -20,13 +15,11 @@ import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.data.Stat;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.esb.core.Base;
+import com.esb.service.InitRouteInfoService;
 import com.esb.service.ZookeeperService;
 import com.esb.util.Constant;
 
@@ -45,7 +38,7 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
 	private static CuratorFramework _client = null;
 	
 	@Autowired
-	private CamelContext _camelContext;
+	private InitRouteInfoService _initRouteInfoService;
 	
 	public ZookeeperServiceImpl() {
 		initCreateZookeeperService();
@@ -98,17 +91,10 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
 				
 				ChildData childData = nodeCache.getCurrentData();
 				_logger.info("-----------ZookeeperServiceImpl.registerNodeCacheListener()--------------");
-				_logger.info("Path:" + childData.getPath());
-//				String routeId = childData.getPath();
-//				//把原来的路由信息删除然后新增路由
-//				_camelContext.removeRoute(routeId);
-//				
-//				if(childData != null) {
-//					
-//					String data = new String(childData.getData());
-//					Document registerXML = DocumentHelper.parseText(data);
-//					registerXML.getRootElement();
-//				}
+				String path = childData.getPath();
+				_logger.info("Path:" + path);
+				String data = new String(childData.getData());
+				_initRouteInfoService.initRouteWithZK(path, data);
 			});
 			
 			nodeCache.start();
@@ -151,8 +137,6 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
 						//监听数据变化
 						String p = path + "/" + service;
 						registerNodeCacheListener(p);
-						String routeDirect = "direct:" + Constant.Key.PATH_ESB + "_" + org + "_" + service;
-						_logger.info(routeDirect);
 					}
 				}
 				

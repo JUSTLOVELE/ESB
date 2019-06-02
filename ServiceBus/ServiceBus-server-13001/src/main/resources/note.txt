@@ -1,6 +1,9 @@
 注册:
 	1.通过监听的数据完成camel的路由生成,路由id就是zookeeper的路径/root/orgCode/serviceCode
-	
+	2.从starthttpprocessor抛出一个异常作为测试
+	3.路由调用成功要把正确数据入库
+	4.initRouteInfoServiceImpl中 to还没改为url
+	5.在_lastHttpRouteProcessor中获取zk数据再根据zk的数据生成参数
 已完成:
 	1.监听zookeeper数据节点,目前已测试新增和更新
 	2.完成json格式注册

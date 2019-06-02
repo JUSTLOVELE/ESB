@@ -167,6 +167,12 @@
 			<artifactId>activemq-camel</artifactId>
 			<version>5.15.9</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/jdom/jdom -->
+		<dependency>
+		    <groupId>jdom</groupId>
+		    <artifactId>jdom</artifactId>
+		    <version>1.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

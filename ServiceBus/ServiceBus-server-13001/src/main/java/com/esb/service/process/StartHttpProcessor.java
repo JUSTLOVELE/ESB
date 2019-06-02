@@ -46,15 +46,15 @@ public class StartHttpProcessor implements Processor{
 	private void handlerXMLData(String xml, Map<String, Object> head) {
 		
 		Element root = XMLUtil.getRootElement(xml);
-		Element orgCodeElement = root.getChild(Constant.Key.ORG_CODE);
+		Element siteCodeElement = root.getChild(Constant.Key.SITE_CODE);
 		Element serviceCodeElement = root.getChild(Constant.Key.SERVICE_CODE);
 		Element offlineElement = root.getChild(Constant.Key.OFFLINE);
 		
-		if(orgCodeElement == null || orgCodeElement.getValue() == null || "".equals(orgCodeElement.getValue())) {
+		if(siteCodeElement == null || siteCodeElement.getValue() == null || "".equals(siteCodeElement.getValue())) {
 			throw new RuntimeCamelException("orgCode为必填项");
 		}
 		
-		if(serviceCodeElement == null || serviceCodeElement.getValue() == null || "".equals(orgCodeElement.getValue())) {
+		if(serviceCodeElement == null || serviceCodeElement.getValue() == null || "".equals(serviceCodeElement.getValue())) {
 			throw new RuntimeCamelException("serviceCode为必填项");
 		}
 		
@@ -78,7 +78,7 @@ public class StartHttpProcessor implements Processor{
 			}
 		}
 		
-		head.put(Constant.Key.ORG_CODE, orgCodeElement.getValue());
+		head.put(Constant.Key.SITE_CODE, siteCodeElement.getValue());
 		head.put(Constant.Key.SERVICE_CODE, serviceCodeElement.getValue());
 		head.put(Constant.Key.OFFLINE, Integer.valueOf(offlineElement.getValue()));
 		head.put(Constant.Key.PARAMS, params);//该参数可能为空
@@ -93,12 +93,12 @@ public class StartHttpProcessor implements Processor{
 
 		JSONObject json = JSONObject.fromObject(data);
 		
-		if(!json.containsKey(Constant.Key.ORG_CODE)) {
-			throw new RuntimeCamelException("orgCode为必填项");
+		if(!json.containsKey(Constant.Key.SITE_CODE)) {
+			throw new RuntimeCamelException("siteCode为必填项");
 		}
 		
-		if(json.getString(Constant.Key.ORG_CODE) == null || "".equals(json.getString(Constant.Key.ORG_CODE))) {
-			throw new RuntimeCamelException("orgCode为不能为空");
+		if(json.getString(Constant.Key.SITE_CODE) == null || "".equals(json.getString(Constant.Key.SITE_CODE))) {
+			throw new RuntimeCamelException("siteCode为不能为空");
 		} 
 		
 		if(!json.containsKey(Constant.Key.SERVICE_CODE)) {
@@ -106,7 +106,7 @@ public class StartHttpProcessor implements Processor{
 		}
 		
 		if(json.getString(Constant.Key.SERVICE_CODE) == null || "".equals(json.getString(Constant.Key.SERVICE_CODE))) {
-			throw new RuntimeCamelException("orgCode为不能为空");
+			throw new RuntimeCamelException("serviceCode为不能为空");
 		}
 		
 		if(!json.containsKey(Constant.Key.OFFLINE)) {
@@ -130,7 +130,7 @@ public class StartHttpProcessor implements Processor{
 			}
 		}
 		
-		head.put(Constant.Key.ORG_CODE, json.getString(Constant.Key.ORG_CODE));
+		head.put(Constant.Key.SITE_CODE, json.getString(Constant.Key.SITE_CODE));
 		head.put(Constant.Key.SERVICE_CODE, json.getString(Constant.Key.SERVICE_CODE));
 		head.put(Constant.Key.OFFLINE, json.getString(Constant.Key.OFFLINE));
 		head.put(Constant.Key.PARAMS, params);//该参数是有可能为空的哦
@@ -139,6 +139,10 @@ public class StartHttpProcessor implements Processor{
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
+		Map<String, Object> esbHeadInvoke = new HashMap<String, Object>();
+		//因为没有做用户的等级所有固定放1,意味着只走普通队列
+		esbHeadInvoke.put(Constant.HeadParam.INVOKEPRIORITY, 1);
+		esbHeadInvoke.put(Constant.HeadParam.IS_INVOKE, Boolean.valueOf(false));
 		Message in = exchange.getIn();
 		Map<String, Object> head = in.getHeaders();
 		String method = head.get(Exchange.HTTP_METHOD).toString();
@@ -155,19 +159,17 @@ public class StartHttpProcessor implements Processor{
 			throw new RuntimeCamelException("method既不是post也不是get");
 		}
 		
-		//因为没有做用户的等级所有固定放1,意味着只走普通队列
-		in.getHeaders().put(Constant.HeadParam.INVOKEPRIORITY, 1);
-		in.getHeaders().put(Constant.HeadParam.IS_INVOKE, Boolean.valueOf(false));
 		_logger.info(("data = " + data));
 		String routeId = exchange.getFromRouteId();
 		
 		if(routeId.contains(Constant.Key.JSON)) {
-			handlerJSONData(data, head);
+			handlerJSONData(data, esbHeadInvoke);
 		}else if(routeId.contains(Constant.Key.XML)){
-			handlerXMLData(data, head);
+			handlerXMLData(data, esbHeadInvoke);
 		}else {
 			throw new RuntimeCamelException("未知路由ID:" + routeId);
 		}
-		
+		//将参数加入头中
+		head.put(Constant.Key.ESB_HEAD_INVOKE, esbHeadInvoke);
 	}
 }

@@ -1,8 +1,7 @@
 package com.esb.route.bean;
 
 
-import java.sql.Date;
-import java.util.Calendar;
+import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.commons.logging.Log;
@@ -40,7 +39,11 @@ public class RouterErrorHandler {
 	private void saveExceptionMsg(String routeId, String key, String uri, String errorMsg, Exchange exchange) {
 		
 		//Date date = new Date(new java.util.Date().getTime());
-		EsbExceptionEntity entity = new EsbExceptionEntity(UUIDUtil.getUUID(), routeId, key, uri, null, errorMsg);
+		Map<String, Object> heads = exchange.getIn().getHeaders();
+		Map<String, Object> esbHeadInvoke = (Map<String, Object>) heads.get(Constant.Key.ESB_HEAD_INVOKE);
+		String siteCode = (String) esbHeadInvoke.get(Constant.Key.SITE_CODE);
+		String serviceCode = (String) esbHeadInvoke.get(Constant.Key.SERVICE_CODE);
+		EsbExceptionEntity entity = new EsbExceptionEntity(UUIDUtil.getUUID(), routeId, key, uri, null, errorMsg, siteCode, serviceCode);
 		_esbExceptionService.saveESBExceptionEntity(entity);
 		String data = "失敗路由id:" + entity.getOpId() + ";失敗消息:" + errorMsg;
 		
@@ -51,10 +54,25 @@ public class RouterErrorHandler {
 		}else {
 			//默认xml
 			data = XMLUtil.errorReturn(data);
-			_logger.info("未知routeId類型");
+			_logger.info("未知routeId类型");
 		}
 		
 		exchange.getOut().setBody(data);
+	}
+	
+	/**
+	 * 根据站点生成路由报错(http资源)
+	 * @param exchange
+	 */
+	public void handlerHttpSiteRoute(Exchange exchange) {
+		
+		Exception exce = exchange.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class);
+		_logger.info("FromrouteId = " + exchange.getFromRouteId());
+		_logger.info("endpointKey = " + exchange.getFromEndpoint().getEndpointKey());//请求的key,例如:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson
+		_logger.info("endpointuri = " + exchange.getFromEndpoint().getEndpointUri());//例如:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson
+		_logger.info("---RouterErrorHandler.handlerHttp,"+exce.getMessage(),exce);
+		saveExceptionMsg(exchange.getFromRouteId(), exchange.getFromEndpoint().getEndpointKey(), exchange.getFromEndpoint().getEndpointUri(), exce.getMessage(), exchange);
+	
 	}
 	
 	/**
