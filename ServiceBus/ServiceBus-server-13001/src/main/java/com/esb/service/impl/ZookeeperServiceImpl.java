@@ -2,6 +2,8 @@ package com.esb.service.impl;
 
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder.Case;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.curator.RetryPolicy;
@@ -9,7 +11,9 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
@@ -22,6 +26,7 @@ import com.esb.core.Base;
 import com.esb.service.InitRouteInfoService;
 import com.esb.service.ZookeeperService;
 import com.esb.util.Constant;
+import com.esb.util.ThreadPoolUtil;
 
 /**
  * @Description:zookeeper服务接口实现
@@ -41,7 +46,7 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
 	private InitRouteInfoService _initRouteInfoService;
 	
 	public ZookeeperServiceImpl() {
-		initCreateZookeeperService();
+		//initCreateZookeeperService();
 	}
 	
 	@Override
@@ -65,12 +70,42 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
     }
 	
 	@Override
-    public PathChildrenCache registerPathChildListener(String nodePath, PathChildrenCacheListener listener){
+    public PathChildrenCache registerPathChildListener(String nodePath){
         try {
             //1. 创建一个PathChildrenCache
             PathChildrenCache pathChildrenCache = new PathChildrenCache(_client, nodePath, true);
             //2. 添加目录监听器
-            pathChildrenCache.getListenable().addListener(listener);
+            pathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
+				
+				@Override
+				public void childEvent(CuratorFramework arg0, PathChildrenCacheEvent event) throws Exception {
+					// TODO Auto-generated method stub
+					String path = event.getData().getPath();
+					PathChildrenCacheEvent.Type eventType = event.getType();
+					
+					switch (eventType) {
+					case CHILD_ADDED:
+						
+						_logger.info("child_add=" + path);
+						_initRouteInfoService.addRouteWithZK(path, new String(event.getData().getData()));
+						break;
+					case CHILD_UPDATED:
+						
+						_logger.info("child_update=" + path);
+						_initRouteInfoService.updateRouteWithZK(path, new String(event.getData().getData()));
+						break;
+						
+					case CHILD_REMOVED:
+						
+						_logger.info("child_remove=" + path);
+						_initRouteInfoService.deleteRouteWithZK(path);
+						break;
+
+					default:
+						break;
+					}
+				}
+			}, ThreadPoolUtil.getThreadPool());
             //3. 启动监听器
             pathChildrenCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
             //4. 返回PathChildrenCache
@@ -82,20 +117,20 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
     }
 	
 	@Override
+	@Deprecated
 	public NodeCache registerNodeCacheListener(String nodePath) {
 		
 		try {
 			
 			NodeCache nodeCache = new NodeCache(_client, nodePath);
-			nodeCache.getListenable().addListener(() -> {
-				
+			/*nodeCache.getListenable().addListener(() -> {
 				ChildData childData = nodeCache.getCurrentData();
 				_logger.info("-----------ZookeeperServiceImpl.registerNodeCacheListener()--------------");
 				String path = childData.getPath();
 				_logger.info("Path:" + path);
 				String data = new String(childData.getData());
 				_initRouteInfoService.initRouteWithZK(path, data);
-			});
+			});*/
 			
 			nodeCache.start();
 			return nodeCache;
@@ -121,22 +156,23 @@ public class ZookeeperServiceImpl extends Base implements ZookeeperService {
 		if(!checkExists(Constant.Key.PATH_ROOT)) {
 			
 			createNode(Constant.Key.PATH_ROOT, CreateMode.PERSISTENT, null);
-			//registerNodeCacheListener(Constant.Key.PATH_ROOT);
 		}else {
 			
 			try {
 				
-				List<String> orglist = _client.getChildren().forPath(Constant.Key.PATH_ROOT);
+				List<String> sitelist = _client.getChildren().forPath(Constant.Key.PATH_ROOT);
 				
-				for(String org: orglist) {
+				for(String site: sitelist) {
 					
-					String path  = Constant.Key.PATH_ROOT + "/" + org;
-					List<String> serviceList = _client.getChildren().forPath(path);
-					
-					for(String service: serviceList) {
-						//监听数据变化
-						String p = path + "/" + service;
-						registerNodeCacheListener(p);
+					String sitePath  = Constant.Key.PATH_ROOT + "/" + site;
+					registerPathChildListener(sitePath);
+					List<String> servicelist = _client.getChildren().forPath(sitePath);
+
+					for(String service: servicelist) {
+						
+						String path = sitePath + "/" + service;
+						String data = getData(path);
+						_initRouteInfoService.addRouteWithZK(path, data);
 					}
 				}
 				

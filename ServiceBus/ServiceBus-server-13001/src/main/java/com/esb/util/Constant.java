@@ -21,7 +21,15 @@ public class Constant {
 	
 	public static String ACTIVEMQ_ADDRESS = null;
 	
+	public static String Constant_PUBLIC_KEY = "";
+
+	public static String Constant_PRIVATE_KEY = "";
+	
+	public static String ENCRYPT_KEY = "";
+	
 	public final static String SUCCESS_SAVE = "保存成功";
+	
+	public final static String SPLIT_SIGN = "&&&&";
 	
 	public interface Status {
 		
@@ -35,12 +43,34 @@ public class Constant {
 	}
 	
 	public interface HeadParam{
-		/**优先级**/
-		public String INVOKEPRIORITY = "invokePriority";
 		/**是否被调用**/
-		public String IS_INVOKE = "isInvoke";
+		public String ESB_IS_INVOKE = "esb_isinvoke";
 		/**状态**/
 		public int END_QUEUE = -100;
+		/**用户OPID**/
+		public String ESB_USER_OP_ID = "esb_useropid";
+		
+		public String ESB_USER_ID = "esb_user_id";
+		
+		public String ESB_USER_PHONE = "esb_user_phone";
+		
+		public String ESB_USER_EMAIL = "esb_user_email";
+		
+		public String AUTHORIZATION = "Authorization";
+		
+		public String ESB_SITE_CODE = "esb_site_code";
+		
+		public String ESB_SERVICE_CODE = "esb_service_code";
+		
+		public String ESB_OFFLINE = "esb_offline";
+		
+		public String ESB_PARAMS = "esb_params";
+		
+		public String ESB_INVOKE_DATA_TYPE = "esb_invoke_data_type";
+		/**选择站点动态路由调用次数**/
+		public String ESB_COUNT_SELECT_SITE = "esb_countSelectSite";
+		/**选择优先级队列动态路由调用次数**/
+		public String ESB_COUNT_ROUTE_PRIORITY = "esb_countroutePriority";
 	}
 	
 	public interface RouteId {
@@ -58,6 +88,14 @@ public class Constant {
 
 
 	public interface Key{
+		
+		public String COUNTINVOKEPRIORITY = "countInvokePriority";
+		
+		public String ENCRYPT_KEY = "ENCRYPT_KEY";
+		
+		public String CONSTANTPUBLICKEY = "constantPublickey";
+		
+		public String CONSTANTPRIVATEKEY = "constantPrivateKey";
 		
 		public String ACTIVEMQ_ADDRESS = "activemqAddress";
 		
@@ -85,10 +123,6 @@ public class Constant {
 		
 		public String PARAM = "param";
 		
-		public String ESB_HEAD_INVOKE = "esbHeadInvoke";
-		
-		public String ESB_HEAD_REGISTER = "esbHeadRegister";
-		
 		public String PARAMS = "params";
 		
 		public String POST = "POST";
@@ -104,10 +138,12 @@ public class Constant {
 		public String OFFLINE = "offline";
 		
 		public String VALUE = "value";
-		/**选择优先级队列动态路由调用次数**/
-		public String COUNT_INVOKEPRIORITY = "countInvokePriority";
-		/**选择站点动态路由调用次数**/
-		public String COUNT_SELECT_SITE = "countSelectSite";
+		
+		public String USER_NAME = "userName";
+		
+		public String PASSWORD = "password";
+		
+		public String TOKEN = "token";
 	}
 	
 	//本地配置文件

@@ -1,14 +1,10 @@
 package com.esb.service;
 
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.zookeeper.CreateMode;
-
-import com.esb.sys.ZookeeperOperation;
 
 /**
  * @Description:zookeeper服务接口
@@ -28,7 +24,7 @@ public interface ZookeeperService {
      * @param listener 监控事件的回调接口
      * @return org.apache.curator.framework.recipes.cache.PathChildrenCache
      */
-	public PathChildrenCache registerPathChildListener(String nodePath, PathChildrenCacheListener listener);
+	public PathChildrenCache registerPathChildListener(String nodePath);
 
 	/**
 	 * 注册目录监听器
@@ -45,6 +41,7 @@ public interface ZookeeperService {
 	 * @param nodePath
 	 * @return NodeCache:对一个节点进行监听,监听事件包括制定指定路径的增删改操作
 	 */
+	@Deprecated
 	public NodeCache registerNodeCacheListener(String nodePath);
 
 	/**

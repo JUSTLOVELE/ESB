@@ -1,14 +1,8 @@
 package com.esb;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
-import java.util.ArrayList;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 
-import org.apache.camel.CamelContext;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -18,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.esb.service.ZookeeperService;
 import com.esb.service.impl.ZookeeperServiceImpl;
-import com.esb.service.route.HttpPublisherRouter;
 import com.esb.util.Constant;
 
 
@@ -58,6 +50,9 @@ public class InitStartComponent {
 		//Constant.ZOOKEEPER_ADDRESS = "192.168.1.150:2181,192.168.1.151:2181,192.168.1.2:2181";
 		Constant.ZOOKEEPER_ADDRESS = Constant.getConstObject(Constant.Key.ZOOKEEPER_ADDRESS);
 		Constant.ACTIVEMQ_ADDRESS = Constant.getConstObject(Constant.Key.ACTIVEMQ_ADDRESS);
+		Constant.Constant_PUBLIC_KEY = Constant.getConst(Constant.Key.CONSTANTPUBLICKEY);
+		Constant.Constant_PRIVATE_KEY = Constant.getConst(Constant.Key.CONSTANTPRIVATEKEY);
+		Constant.ENCRYPT_KEY = Constant.getConst(Constant.Key.ENCRYPT_KEY);
 		_logger.info("zookeeper address=" + Constant.ZOOKEEPER_ADDRESS);
 		_logger.info("activemq address=" + Constant.ACTIVEMQ_ADDRESS);
 	}

@@ -62,21 +62,23 @@ public class InvokeService extends Base{
 			return returnErrorCode("type为必填");
 		}
 		
-		if(json.containsKey(Constant.Key.PARAM)) {
-			return returnErrorCode("param为必填");
-		}
-		
 		String siteCode = json.getString(Constant.Key.SITE_CODE);
 		String serviceCode = json.getString(Constant.Key.SERVICE_CODE);
 		//String url = json.getString(Constant.Key.URL);
 		//int type = json.getInt(Constant.Key.TYPE);
 		param = XMLUtil.parseJSONToRegisterXMLInfo(json);
+		String sitePath = Constant.Key.PATH_ROOT + "/" + siteCode;
+		
+		if(!_zookeeperService.checkExists(sitePath)) {
+			
+			_zookeeperService.createNode(sitePath, CreateMode.PERSISTENT, null);
+			_zookeeperService.registerPathChildListener(sitePath);
+		}
+		
 		String path = Constant.Key.PATH_ROOT + "/" + siteCode + "/" + serviceCode;
 		
 		if(!_zookeeperService.checkExists(path)) {
-			
 			_zookeeperService.createNode(path, CreateMode.PERSISTENT, param);
-			_zookeeperService.registerNodeCacheListener(path);
 		}else {
 			_zookeeperService.updateNodeDate(path, param);
 		}

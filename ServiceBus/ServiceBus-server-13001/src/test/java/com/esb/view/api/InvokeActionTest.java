@@ -36,4 +36,5 @@ public class InvokeActionTest extends Base{
 		String s = _invokeAction.registerWithJson(param);
 		System.out.println(s);
 	}
+	
 }

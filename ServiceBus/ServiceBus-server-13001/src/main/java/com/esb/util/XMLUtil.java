@@ -33,7 +33,7 @@ public class XMLUtil {
 		Element serviceCodeElement = root.getChild(Constant.Key.SERVICE_CODE);
 		Element urlElement = root.getChild(Constant.Key.URL);
 		Element typeElement = root.getChild(Constant.Key.TYPE);
-		List<Element> paramElements = root.getChildren(Constant.Key.PARAM);
+		List<Element> paramElements = root.getChildren(Constant.Key.PARAMS);
 		List<Map<String, Object>> params = null;
 		
 		if(paramElements != null && paramElements.size() > 0) {
@@ -54,7 +54,7 @@ public class XMLUtil {
 		map.put(Constant.Key.SERVICE_CODE, serviceCodeElement.getValue());
 		map.put(Constant.Key.URL, urlElement.getValue());
 		map.put(Constant.Key.TYPE, Integer.valueOf(typeElement.getValue()));
-		map.put(Constant.Key.PARAM, params);
+		map.put(Constant.Key.PARAMS, params);
 		
 		return map;
 	}
@@ -103,7 +103,7 @@ public class XMLUtil {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("<root>");
-		sb.append("<orgCode><![CDATA[" + json.getString(Constant.Key.SITE_CODE) + "]]></orgCode>");
+		sb.append("<siteCode><![CDATA[" + json.getString(Constant.Key.SITE_CODE) + "]]></siteCode>");
 		sb.append("<serviceCode><![CDATA[" + json.getString(Constant.Key.SERVICE_CODE) + "]]></serviceCode>");
 		sb.append("<url><![CDATA[" + json.getString(Constant.Key.URL) + "]]></url>");
 		sb.append("<type><![CDATA[" + json.getInt(Constant.Key.TYPE) + "]]></type>");
@@ -117,10 +117,10 @@ public class XMLUtil {
 				
 				for(int i=0; i<array.size(); i++) {
 					
-					sb.append("<param>");
-					sb.append("<key><![CDATA[" + array.getJSONObject(i).getInt(Constant.Key.KEY) + "]]></key>");
+					sb.append("<params>");
+					sb.append("<key><![CDATA[" + array.getJSONObject(i).getString(Constant.Key.KEY) + "]]></key>");
 					sb.append("<type><![CDATA[" + array.getJSONObject(i).getInt(Constant.Key.TYPE) + "]]></type>");
-					sb.append("</param>");
+					sb.append("</params>");
 				}
 			}
 		}

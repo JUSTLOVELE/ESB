@@ -1,6 +1,7 @@
 package com.esb.entity;
 
 
+import java.io.Serializable;
 import java.sql.Date;
 
 import javax.persistence.Column;
@@ -22,7 +23,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 @Entity
 @Table(name="esb_exception_tbl")
-public class EsbExceptionEntity {
+public class EsbExceptionEntity implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Column(name = "op_id", length = 32)
@@ -52,6 +55,16 @@ public class EsbExceptionEntity {
 	
 	public EsbExceptionEntity() {
 		
+	}
+	
+	public EsbExceptionEntity(String opId, String routeId, String endpointKey, String endpointUri,
+			String exceptionMsg) {
+		super();
+		this.opId = opId;
+		this.routeId = routeId;
+		this.endpointKey = endpointKey;
+		this.endpointUri = endpointUri;
+		this.exceptionMsg = exceptionMsg;
 	}
 
 	public EsbExceptionEntity(String opId, String routeId, String endpointKey, String endpointUri, Date createDate,

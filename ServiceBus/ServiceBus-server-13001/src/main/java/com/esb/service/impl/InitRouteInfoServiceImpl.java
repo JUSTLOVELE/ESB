@@ -42,9 +42,54 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 	private LastHttpRouteProcessor _lastHttpRouteProcessor;
 	
 	private final static Log _logger = LogFactory.getLog(InitRouteInfoServiceImpl.class);
+	
+	private void addHttp(String route, String routeId, String uri) throws Exception {
+		
+		_logger.info("addHttpRoute = " + routeId);
+		_camelContext.addRoutes(new RouteBuilder() {
+			
+			@Override
+			public void configure() throws Exception {
+				
+				errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttpSiteRoute"));
+				from(route).routeId(routeId)
+				.process(_lastHttpRouteProcessor)
+				.to(ExchangePattern.InOut, uri + "?bridgeEndpoint=true&throwExceptionOnFailure=false")
+				.process(_endRouteProcessor).end();
+			}
+		});
+	}
+	
+	private void addRoute(String route, String routeId, String data) throws Exception {
+		
+		Map<String, Object> registerInfo = XMLUtil.getReigsterInfo(data);
+		Integer type = (Integer) registerInfo.get(Constant.Key.TYPE);
+		String url = (String) registerInfo.get(Constant.Key.URL);
+		
+		switch (RegisterType.getValue(type)) {
+		case HTTP:
+			addHttp(route, routeId, url);
+			break;
+			
+		case WEBSERVICE:
+			break;
+			
+		case FILE:
+			break;
+			
+		case COMPLEX:
+			break;
+			
+		case MESSAGE_SEND:
+			break;
+
+		default:
+			break;
+		}
+	}
 
 	@Override
-	public boolean initRouteWithZK(String path, String data) {
+	public boolean addRouteWithZK(String path, String data) {
 		
 		try {
 			
@@ -56,45 +101,52 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			String route = "direct:" + root + "_" + siteCode + "_" + serviceCode;
 			String routeId = root + "_" + siteCode + "_" + serviceCode;
 			_logger.info(route);
-			//把原来的路由信息删除然后新增路由
-			_camelContext.removeRoute(route);
-			Map<String, Object> registerInfo = XMLUtil.getReigsterInfo(data);
-			Integer type = (Integer) registerInfo.get(Constant.Key.TYPE);
-			String url = (String) registerInfo.get(Constant.Key.URL);
+			addRoute(route, routeId, data);
 			
-			switch (RegisterType.getValue(type)) {
-			case HTTP:
-				
-				_camelContext.addRoutes(new RouteBuilder() {
-					
-					@Override
-					public void configure() throws Exception {
-						
-						errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttpSiteRoute"));
-						from(route).routeId(routeId)
-						.process(_lastHttpRouteProcessor)
-						//.to(ExchangePattern.InOut, "http4://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1&bridgeEndpoint=true&throwExceptionOnFailure=false")
-						.to(ExchangePattern.InOut, "http4://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1&bridgeEndpoint=true&throwExceptionOnFailure=false")
-						.process(_endRouteProcessor).end();
-					}
-				});
-				break;
-				
-			case WEBSERVICE:
-				break;
-				
-			case FILE:
-				break;
-				
-			case COMPLEX:
-				break;
-				
-			case MESSAGE_SEND:
-				break;
+		} catch (Exception e) {
+			_logger.error("", e);
+		}
+		
+		return false;
+	}
 
-			default:
-				break;
-			}
+	@Override
+	public boolean updateRouteWithZK(String path, String data) {
+		
+		try {
+			
+			path = path.substring(1, path.length());
+			String [] p = path.split("/");
+			String root = p[0];
+			String siteCode = p[1];
+			String serviceCode = p[2];
+			String route = "direct:" + root + "_" + siteCode + "_" + serviceCode;
+			String routeId = root + "_" + siteCode + "_" + serviceCode;
+			_logger.info(route);
+			_camelContext.removeRoute(routeId);
+			addRoute(route, routeId, data);
+			
+		} catch (Exception e) {
+			_logger.error("", e);
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean deleteRouteWithZK(String path) {
+		
+		try {
+			
+			path = path.substring(1, path.length());
+			String [] p = path.split("/");
+			String root = p[0];
+			String siteCode = p[1];
+			String serviceCode = p[2];
+			String route = "direct:" + root + "_" + siteCode + "_" + serviceCode;
+			String routeId = root + "_" + siteCode + "_" + serviceCode;
+			_logger.info(route);
+			_camelContext.removeRoute(routeId);
 			
 		} catch (Exception e) {
 			_logger.error("", e);

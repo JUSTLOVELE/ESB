@@ -14,10 +14,15 @@ import org.apache.camel.RuntimeCamelException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdom.Element;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.esb.entity.EsbUserEntity;
+import com.esb.service.UserService;
+import com.esb.sys.InvokeDataType;
 import com.esb.util.Constant;
 import com.esb.util.XMLUtil;
+import com.esb.util.encrypt.RSA;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -33,6 +38,9 @@ import net.sf.json.JSONObject;
 public class StartHttpProcessor implements Processor{
 	
 	private final static Log _logger = LogFactory.getLog(StartHttpProcessor.class);
+	
+	@Autowired
+	private UserService _userService;
 	
 	public StartHttpProcessor() {
 		
@@ -62,26 +70,10 @@ public class StartHttpProcessor implements Processor{
 			throw new RuntimeCamelException("serviceCode为必填项");
 		}
 		
-		List<Element> paramElements = root.getChildren(Constant.Key.PARAM);
-		List<Map<String, Object>> params = null;
-		
-		if(paramElements != null && paramElements.size() > 0) {
-			
-			params = new ArrayList<Map<String, Object>>();
-			
-			for(Element param: paramElements) {
-				
-				Map<String, Object> m = new HashMap<String, Object>();
-				m.put(Constant.Key.VALUE, param.getChild(Constant.Key.VALUE).getValue());
-				m.put(Constant.Key.KEY, param.getChild(Constant.Key.KEY).getValue());
-				params.add(m);
-			}
-		}
-		
-		head.put(Constant.Key.SITE_CODE, siteCodeElement.getValue());
-		head.put(Constant.Key.SERVICE_CODE, serviceCodeElement.getValue());
-		head.put(Constant.Key.OFFLINE, Integer.valueOf(offlineElement.getValue()));
-		head.put(Constant.Key.PARAMS, params);//该参数可能为空
+		head.put(Constant.HeadParam.ESB_SITE_CODE, siteCodeElement.getValue());
+		head.put(Constant.HeadParam.ESB_SERVICE_CODE, serviceCodeElement.getValue());
+		head.put(Constant.HeadParam.ESB_OFFLINE, Integer.valueOf(offlineElement.getValue()));
+		head.put(Constant.HeadParam.ESB_INVOKE_DATA_TYPE, InvokeDataType.XML.getValue());
 	}
 	
 	/***
@@ -113,38 +105,47 @@ public class StartHttpProcessor implements Processor{
 			throw new RuntimeCamelException("offline为不能为空");
 		}
 		
-		List<Map<String, Object>> params = null;
-		
-		if(json.containsKey(Constant.Key.PARAMS)) {
-			
-			JSONArray array = json.getJSONArray(Constant.Key.PARAMS);
-			params = new ArrayList<Map<String, Object>>();
-			
-			for(int i=0; i<array.size(); i++) {
-				
-				JSONObject param = array.getJSONObject(i);
-				Map<String, Object> m = new HashMap<String, Object>();
-				m.put(Constant.Key.VALUE, param.get(Constant.Key.VALUE));
-				m.put(Constant.Key.KEY, param.get(Constant.Key.KEY));
-				params.add(m);
-			}
-		}
-		
-		head.put(Constant.Key.SITE_CODE, json.getString(Constant.Key.SITE_CODE));
-		head.put(Constant.Key.SERVICE_CODE, json.getString(Constant.Key.SERVICE_CODE));
-		head.put(Constant.Key.OFFLINE, json.getString(Constant.Key.OFFLINE));
-		head.put(Constant.Key.PARAMS, params);//该参数是有可能为空的哦
+		head.put(Constant.HeadParam.ESB_SITE_CODE, json.getString(Constant.Key.SITE_CODE));
+		head.put(Constant.HeadParam.ESB_SERVICE_CODE, json.getString(Constant.Key.SERVICE_CODE));
+		head.put(Constant.HeadParam.ESB_OFFLINE, json.getString(Constant.Key.OFFLINE));
+		head.put(Constant.HeadParam.ESB_INVOKE_DATA_TYPE, InvokeDataType.JSON.getValue());
 	}
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		
-		Map<String, Object> esbHeadInvoke = new HashMap<String, Object>();
-		//因为没有做用户的等级所有固定放1,意味着只走普通队列
-		esbHeadInvoke.put(Constant.HeadParam.INVOKEPRIORITY, 1);
-		esbHeadInvoke.put(Constant.HeadParam.IS_INVOKE, Boolean.valueOf(false));
+
+		//验证用户
 		Message in = exchange.getIn();
 		Map<String, Object> head = in.getHeaders();
+		String token = (String) head.get(Constant.HeadParam.AUTHORIZATION);
+		token = RSA.decryptByPrivate(token, Constant.Constant_PRIVATE_KEY);
+		
+		if(token == null || "".equals(token)) {
+			throw new RuntimeCamelException("token错误");
+		}
+		
+		String[] array = token.split(Constant.SPLIT_SIGN);
+		
+		if(array == null || array.length != 2) {
+			throw new RuntimeCamelException("密码格式错误导致token解析失败");
+		}
+		
+		EsbUserEntity user = _userService.userLogin(array[0], array[1]);
+		
+		if(user == null) {
+			throw new RuntimeCamelException("登录失败");
+		}
+		
+		//-----------------------------
+		//Map<String, Object> esbHeadInvoke = new HashMap<String, Object>();
+		//因为没有做用户的等级所有固定放1,意味着只走普通队列
+		head.put(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY, user.getUserLevel());
+		head.put(Constant.HeadParam.ESB_IS_INVOKE, Boolean.valueOf(false));
+		head.put(Constant.HeadParam.ESB_USER_EMAIL, user.getUserEmail());
+		head.put(Constant.HeadParam.ESB_USER_ID, user.getUserId());
+		head.put(Constant.HeadParam.ESB_USER_OP_ID, user.getOpId());
+		head.put(Constant.HeadParam.ESB_USER_PHONE, user.getUserPhone());
+		
 		String method = head.get(Exchange.HTTP_METHOD).toString();
 		String data = null;
 		
@@ -163,13 +164,11 @@ public class StartHttpProcessor implements Processor{
 		String routeId = exchange.getFromRouteId();
 		
 		if(routeId.contains(Constant.Key.JSON)) {
-			handlerJSONData(data, esbHeadInvoke);
+			handlerJSONData(data, head);
 		}else if(routeId.contains(Constant.Key.XML)){
-			handlerXMLData(data, esbHeadInvoke);
+			handlerXMLData(data, head);
 		}else {
 			throw new RuntimeCamelException("未知路由ID:" + routeId);
 		}
-		//将参数加入头中
-		head.put(Constant.Key.ESB_HEAD_INVOKE, esbHeadInvoke);
 	}
 }

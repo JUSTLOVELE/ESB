@@ -39,6 +39,12 @@ public class InvokeAction extends Base{
 		return _invokeService.registerWithXML(param);
 	}
 	
+	@RequestMapping(value = "/helloworld", produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String helloworld() {
+		return "无参数测试";
+	}
+	
 	/*@RequestMapping("/invokeWithJson")
 	@ResponseBody
 	public String invokeWithJson(String param) {

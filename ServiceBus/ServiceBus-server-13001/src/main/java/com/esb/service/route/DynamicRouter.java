@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.esb.core.Base;
 import com.esb.entity.EsbExceptionEntity;
 import com.esb.service.ESBExceptionService;
 import com.esb.util.Constant;
@@ -26,7 +27,7 @@ import com.esb.util.UUIDUtil;
  * @history:
  */
 @Component
-public class DynamicRouter {
+public class DynamicRouter extends Base{
 	
 	private final static Log _logger = LogFactory.getLog(DynamicRouter.class);
 	
@@ -50,13 +51,16 @@ public class DynamicRouter {
 		
 		Message in = exchange.getIn();
 		Map<String, Object> heads = in.getHeaders();
-		Map<String, Object> esbHeadInvoke = (Map<String, Object>) heads.get(Constant.Key.ESB_HEAD_INVOKE);
 		
-		if(esbHeadInvoke.containsKey(Constant.Key.COUNT_SELECT_SITE)) {
+		for(Map.Entry<String, Object> entry: heads.entrySet()) {
+			System.out.println(entry.getKey() + "=" + entry.getValue());
+		}
+		
+		if(heads.containsKey(Constant.HeadParam.ESB_COUNT_SELECT_SITE)) {
 			
-			Integer count = (Integer) esbHeadInvoke.get(Constant.Key.COUNT_SELECT_SITE);
+			Integer count = (Integer) heads.get(Constant.HeadParam.ESB_COUNT_SELECT_SITE);
 			
-			if(count > Integer.valueOf(Constant.getConst(Constant.Key.COUNT_SELECT_SITE))) {
+			if(count > Integer.valueOf(Constant.getConst(Constant.Key.COUNTINVOKEPRIORITY))) {
 				//超过重连次数
 				String errorMsg = "找不到路由对象,重连次数超过10次";
 				saveErrorMsg(exchange, errorMsg);
@@ -64,16 +68,16 @@ public class DynamicRouter {
 				return null;
 			}
 			
-			esbHeadInvoke.put(Constant.Key.COUNT_SELECT_SITE, count++);
+			heads.put(Constant.HeadParam.ESB_COUNT_SELECT_SITE, count++);
 		}else {
-			esbHeadInvoke.put(Constant.Key.COUNT_SELECT_SITE, 1);
+			heads.put(Constant.HeadParam.ESB_COUNT_SELECT_SITE, 1);
 		}
 		
-		Boolean isInvoke = (Boolean) esbHeadInvoke.get(Constant.HeadParam.IS_INVOKE);
+		Boolean isInvoke = (Boolean) heads.get(Constant.HeadParam.ESB_IS_INVOKE);
 		
 		if(!isInvoke) {
 			
-			String route = "direct:esb_" + esbHeadInvoke.get(Constant.Key.SITE_CODE) + "_" + esbHeadInvoke.get(Constant.Key.SERVICE_CODE);
+			String route = "direct:esb_" + heads.get(Constant.HeadParam.ESB_SITE_CODE) + "_" + heads.get(Constant.HeadParam.ESB_SERVICE_CODE);
 			_logger.info("selectRoute = " + route);
 			return route;
 		}else {
@@ -89,16 +93,19 @@ public class DynamicRouter {
 	 * @return
 	 */
 	//通过@Header(SystemConstant.HEADER_NAME_INVOKE_PRIORITY)Integer invokePriority 可以访问头参数的数据
-	public String routeByPriority(Exchange exchange, @Header(Constant.HeadParam.INVOKEPRIORITY) Integer invokePriority){
+	public String routeByPriority(Exchange exchange){
 		
 		Map<String, Object> heads = exchange.getIn().getHeaders();
-		Map<String, Object> esbHeadInvoke = (Map<String, Object>) heads.get(Constant.Key.ESB_HEAD_INVOKE);
 		
-		if(esbHeadInvoke.containsKey(Constant.Key.COUNT_INVOKEPRIORITY)) {
+		for(Map.Entry<String, Object> entry: heads.entrySet()) {
+			System.out.println(entry.getKey() + "=" + entry.getValue());
+		}
+		
+		if(heads.containsKey(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY)) {
 			
-			Integer count = (Integer) esbHeadInvoke.get(Constant.Key.COUNT_INVOKEPRIORITY);
+			Integer count = (Integer) heads.get(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY);
 			
-			if(count > Integer.valueOf(Constant.getConst(Constant.Key.COUNT_INVOKEPRIORITY))) {
+			if(count > Integer.valueOf(Constant.getConst(Constant.Key.COUNTINVOKEPRIORITY))) {
 				//超过重连次数
 				String errorMsg = "连接不到生产者消息队列超过10次";
 				saveErrorMsg(exchange, errorMsg);
@@ -106,10 +113,12 @@ public class DynamicRouter {
 				return null;
 			}
 			
-			esbHeadInvoke.put(Constant.Key.COUNT_INVOKEPRIORITY, count++);
+			heads.put(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY, count++);
 		}else {
-			esbHeadInvoke.put(Constant.Key.COUNT_INVOKEPRIORITY, 1);
+			heads.put(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY, 1);
 		}
+		
+		Integer invokePriority = Integer.valueOf(heads.get(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY).toString());
 		
 		if(invokePriority==null) {
 			throw new RuntimeCamelException("invokePriority未知=" + invokePriority);

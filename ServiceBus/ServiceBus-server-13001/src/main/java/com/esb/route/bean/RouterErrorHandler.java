@@ -4,6 +4,7 @@ package com.esb.route.bean;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +41,20 @@ public class RouterErrorHandler {
 		
 		//Date date = new Date(new java.util.Date().getTime());
 		Map<String, Object> heads = exchange.getIn().getHeaders();
-		Map<String, Object> esbHeadInvoke = (Map<String, Object>) heads.get(Constant.Key.ESB_HEAD_INVOKE);
-		String siteCode = (String) esbHeadInvoke.get(Constant.Key.SITE_CODE);
-		String serviceCode = (String) esbHeadInvoke.get(Constant.Key.SERVICE_CODE);
-		EsbExceptionEntity entity = new EsbExceptionEntity(UUIDUtil.getUUID(), routeId, key, uri, null, errorMsg, siteCode, serviceCode);
+		EsbExceptionEntity entity = new EsbExceptionEntity(UUIDUtil.getUUID(), routeId, key, uri, errorMsg);
+		String siteCode = null;
+		String serviceCode = null;
+		
+		if(heads.containsKey(Constant.Key.SITE_CODE)) {
+			siteCode = (String) heads.get(Constant.Key.SITE_CODE);
+		}
+		
+		if(heads.containsKey(Constant.Key.SERVICE_CODE)) {
+			serviceCode = heads.get(Constant.Key.SERVICE_CODE).toString();
+		}
+		
+		entity.setSiteCode(siteCode);
+		entity.setServiceCode(serviceCode);
 		_esbExceptionService.saveESBExceptionEntity(entity);
 		String data = "失敗路由id:" + entity.getOpId() + ";失敗消息:" + errorMsg;
 		
@@ -71,6 +82,10 @@ public class RouterErrorHandler {
 		_logger.info("endpointKey = " + exchange.getFromEndpoint().getEndpointKey());//请求的key,例如:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson
 		_logger.info("endpointuri = " + exchange.getFromEndpoint().getEndpointUri());//例如:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson
 		_logger.info("---RouterErrorHandler.handlerHttp,"+exce.getMessage(),exce);
+		Message out = exchange.getOut();
+		Map<String, Object> outheads = out.getHeaders();
+		outheads.put(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY, Constant.HeadParam.END_QUEUE);
+		outheads.put(Constant.HeadParam.ESB_IS_INVOKE, Boolean.valueOf(true));
 		saveExceptionMsg(exchange.getFromRouteId(), exchange.getFromEndpoint().getEndpointKey(), exchange.getFromEndpoint().getEndpointUri(), exce.getMessage(), exchange);
 	
 	}
@@ -86,6 +101,10 @@ public class RouterErrorHandler {
 		_logger.info("endpointKey = " + exchange.getFromEndpoint().getEndpointKey());//请求的key,例如:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson
 		_logger.info("endpointuri = " + exchange.getFromEndpoint().getEndpointUri());//例如:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson
 		_logger.info("---RouterErrorHandler.handlerHttp,"+exce.getMessage(),exce);
+		Message out = exchange.getOut();
+		Map<String, Object> outheads = out.getHeaders();
+		outheads.put(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY, Constant.HeadParam.END_QUEUE);
+		outheads.put(Constant.HeadParam.ESB_IS_INVOKE, Boolean.valueOf(true));
 		saveExceptionMsg(exchange.getFromRouteId(), exchange.getFromEndpoint().getEndpointKey(), exchange.getFromEndpoint().getEndpointUri(), exce.getMessage(), exchange);
 	}
 	

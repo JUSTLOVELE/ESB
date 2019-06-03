@@ -13,6 +13,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import com.esb.service.InitRouteInfoService;
+import com.esb.service.ZookeeperService;
 import com.esb.service.route.ActivemqConsumeRouter;
 import com.esb.service.route.HttpPublisherRouter;
 
@@ -41,15 +42,13 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	@Qualifier("initRouteInfoServiceImpl")
 	private InitRouteInfoService _initRouteInfoService;
 	
+	@Autowired
+	private ZookeeperService _zookeeperService;
+	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		
 		startService(event);
-		startRoute();
-	}
-	
-	private void startRoute() {
-		_initRouteInfoService.initRouteWithZK("direct:esb_350000_checkVersion", "http://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion?source=1");
 	}
 	
 	/**
@@ -82,6 +81,8 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 					}
 				}
 			}
+			
+			_zookeeperService.initCreateZookeeperService();
 			
 		} catch (Exception e) {
 			_logger.error("", e);
