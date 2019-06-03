@@ -1,6 +1,8 @@
 注册:
-	2.从starthttpprocessor抛出一个异常作为测试
-	5.在_lastHttpRouteProcessor中获取zk数据再根据zk的数据生成参数
+	1.测试2个和三个参数
+	2.测试二进制数据
+	3.测试图片
+	4.测试pdf等文件
 已完成:
 	1.监听zookeeper数据节点,目前已测试新增和更新
 	2.完成json格式注册
