@@ -1,13 +1,15 @@
 package test.com.camel;
 
-import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -15,20 +17,49 @@ import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
+import org.springframework.util.FileCopyUtils;
 
 import com.esb.core.Base;
-import com.esb.util.Constant;
-import com.esb.util.encrypt.RSA;
+
+import net.sf.json.JSONObject;
 
 public class MainTest extends Base{
+	
+	@Test
+	public void binaryImgTest() {
+		
+		try {
+			File file = new File("D:/11.jpg");
+			byte[] bytes = FileCopyUtils.copyToByteArray(file);
+			String s = new String(bytes, "ISO-8859-1");
+			String name = file.getName();
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("name", name);
+			map.put("binary", s);
+			String json = getJSON(map);
+			//----------------
+			JSONObject j = JSONObject.fromObject(json);
+			String a = j.getString("binary");
+			file = new File("D:/", "44.jpg");
+			InputStream in = new ByteArrayInputStream(a.getBytes("ISO-8859-1"));
+			FileOutputStream fos = new FileOutputStream(file);
+			byte[] b = new byte[1024];
+			int nRead = 0;
+			
+			while ((nRead = in.read(b)) != -1) {
+                fos.write(b, 0, nRead);
+            }
+			
+            fos.flush();
+            fos.close();
+            in.close();
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 	@Test
@@ -41,152 +72,6 @@ public class MainTest extends Base{
 			Session session = connection.createSession();
 			connection.close();
 			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Test
-	public void invokeWithOneParamJsonTest() {
-		
-		try {
-			
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put(Constant.Key.SITE_CODE, "350000");
-			map.put(Constant.Key.SERVICE_CODE, "checkVersion");
-			map.put(Constant.Key.OFFLINE, 0);
-			List<Map<String, Object>> params = new ArrayList<Map<String, Object>>();
-			Map<String, Object> p = new HashMap<String, Object>();
-			p.put("key", "source");
-			p.put("value", 1);
-			params.add(p);
-			map.put("params", params);
-			
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			//HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
-			HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
-			String token = "test" + Constant.SPLIT_SIGN + "123456";
-			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
-			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
-			String param = getJSON(map);
-			StringEntity entity = new StringEntity(param, "utf-8");
-			entity.setContentEncoding("utf-8");
-	        entity.setContentType("application/json");  
-		    post.setEntity(entity);
-			HttpResponse httpResponse = httpClient.execute(post);
-	        httpResponse.setHeader("Content-Type", "text/plain;charset=utf-8");
-	        String s = EntityUtils.toString(httpResponse.getEntity(), "utf-8");
-	        System.out.println(s);
-	        
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		/*Map<String, Object> m = new HashMap<String, Object>();
-		m.put("param", param);*/
-	}
-	
-	@Test
-	public void invokeWithNoParamJsonTest() {
-		
-		try {
-			
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put(Constant.Key.SITE_CODE, "350002");
-			map.put(Constant.Key.SERVICE_CODE, "HelloWorld");
-			map.put(Constant.Key.OFFLINE, 0);
-			
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			//HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
-			HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
-			String token = "test" + Constant.SPLIT_SIGN + "123456";
-			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
-			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
-			String param = getJSON(map);
-			StringEntity entity = new StringEntity(param, "utf-8");
-			entity.setContentEncoding("utf-8");
-	        entity.setContentType("application/json");  
-		    post.setEntity(entity);
-			HttpResponse httpResponse = httpClient.execute(post);
-	        httpResponse.setHeader("Content-Type", "text/plain;charset=utf-8");
-	        String s = EntityUtils.toString(httpResponse.getEntity(), "utf-8");
-	        System.out.println(s);
-	        
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		/*Map<String, Object> m = new HashMap<String, Object>();
-		m.put("param", param);*/
-	}
-	
-	/**
-	 * 无参数测试
-	 */
-	@Test
-	public void registerWithNoParamJsonTest() {
-		
-		try {
-			
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put(Constant.Key.SITE_CODE, "350002");
-			map.put(Constant.Key.SERVICE_CODE, "HelloWorld");
-			map.put(Constant.Key.URL, "http://localhost:13001/ESB/invokeAction/helloworld");
-			map.put(Constant.Key.TYPE, 1);
-			List<Map<String, Object>> params = new ArrayList<Map<String, Object>>();
-			map.put(Constant.Key.PARAMS, params);
-			
-			String param = getJSON(map);
-			System.out.println(param);
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
-			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
-			StringEntity entity = new StringEntity("param=" + param, "utf-8");
-          //  entity.setContentType("application/json;charset=UTF-8");
-            entity.setContentEncoding("utf-8");
-            entity.setContentType("application/x-www-form-urlencoded");  
-	        post.setEntity(entity);
-	        HttpResponse httpResponse = httpClient.execute(post);
-	        httpResponse.setHeader("Content-Type", "text/plain;charset=utf-8");
-	        String s = EntityUtils.toString(httpResponse.getEntity(), "utf-8");
-	        System.out.println(s);
-	        
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Test
-	public void registerWithJsonTest() {
-		
-		try {
-			
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put(Constant.Key.SITE_CODE, "350000");
-			map.put(Constant.Key.SERVICE_CODE, "checkVersion");
-			map.put(Constant.Key.URL, "http://www.fjjkkj.com/HY-GS/mobileSystemAction/api/checkVersion");
-			map.put(Constant.Key.TYPE, 1);
-			List<Map<String, Object>> params = new ArrayList<Map<String, Object>>();
-			Map<String, Object> p = new HashMap<String, Object>();
-			p.put("key", "source");
-			p.put("type", 1);
-			params.add(p);
-			map.put(Constant.Key.PARAMS, params);
-			String param = getJSON(map);
-			System.out.println(param);
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
-			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
-			StringEntity entity = new StringEntity("param=" + param, "utf-8");
-          //  entity.setContentType("application/json;charset=UTF-8");
-            entity.setContentEncoding("utf-8");
-            entity.setContentType("application/x-www-form-urlencoded");  
-	        post.setEntity(entity);
-	        HttpResponse httpResponse = httpClient.execute(post);
-	        httpResponse.setHeader("Content-Type", "text/plain;charset=utf-8");
-	        String s = EntityUtils.toString(httpResponse.getEntity(), "utf-8");
-	        System.out.println(s);
-	        
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
