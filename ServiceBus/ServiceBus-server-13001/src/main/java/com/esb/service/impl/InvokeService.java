@@ -2,6 +2,7 @@ package com.esb.service.impl;
 
 
 import org.apache.zookeeper.CreateMode;
+import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,14 +26,6 @@ public class InvokeService extends Base{
 	@Autowired
 	private ZookeeperServiceImpl _zookeeperService;
 
-	public String invokeWithJson(String param) {
-		return null;
-	}
-	
-	public String invokeWithXML(String param) {
-		return null;
-	}
-	
 	/**
 	 * 
 	 *     {
@@ -87,6 +80,48 @@ public class InvokeService extends Base{
 	}
 	
 	public String registerWithXML(String param) {
-		return null;
+		
+		Element rootElement = XMLUtil.getRootElement(param);
+		Element siteCodeElement = rootElement.getChild(Constant.Key.SITE_CODE);
+		Element serviceCodeElement = rootElement.getChild(Constant.Key.SERVICE_CODE);
+		Element urlElement = rootElement.getChild(Constant.Key.URL);
+		Element typeCodeElement = rootElement.getChild(Constant.Key.TYPE);
+		
+		if(siteCodeElement == null || siteCodeElement.getValue() == null || "".equals(siteCodeElement.getValue())) {
+			return returnErrorCode("siteCode为必填");
+		}
+		
+		if(serviceCodeElement == null || serviceCodeElement.getValue() == null || "".equals(serviceCodeElement.getValue())) {
+			return returnErrorCode("serviceCode为必填");
+		}
+		
+		if(urlElement == null || urlElement.getValue() == null || "".equals(urlElement.getValue())) {
+			return returnErrorCode("url为必填");
+		}
+		
+		if(typeCodeElement == null || typeCodeElement.getValue() == null || "".equals(typeCodeElement.getValue())) {
+			return returnErrorCode("type为必填");
+		}
+		
+		String siteCode = siteCodeElement.getValue();
+		String serviceCode = serviceCodeElement.getValue();
+		
+		String sitePath = Constant.Key.PATH_ROOT + "/" + siteCode;
+		
+		if(!_zookeeperService.checkExists(sitePath)) {
+			
+			_zookeeperService.createNode(sitePath, CreateMode.PERSISTENT, null);
+			_zookeeperService.registerPathChildListener(sitePath);
+		}
+		
+		String path = Constant.Key.PATH_ROOT + "/" + siteCode + "/" + serviceCode;
+		
+		if(!_zookeeperService.checkExists(path)) {
+			_zookeeperService.createNode(path, CreateMode.PERSISTENT, param);
+		}else {
+			_zookeeperService.updateNodeDate(path, param);
+		}
+		
+		return returnGeneralJSONCode(Constant.Status.SUCCESS_CODE, Constant.SUCCESS_SAVE, true);
 	}
 }

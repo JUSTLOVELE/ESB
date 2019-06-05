@@ -44,16 +44,4 @@ public class InvokeAction extends Base{
 	public String helloworld() {
 		return "无参数测试";
 	}
-	
-	/*@RequestMapping("/invokeWithJson")
-	@ResponseBody
-	public String invokeWithJson(String param) {
-		return _invokeService.invokeWithJson(param);
-	}
-	
-	@RequestMapping("/invokeWithXML")
-	@ResponseBody
-	public String invokeWithXML(String param) {
-		return _invokeService.invokeWithXML(param);
-	}*/
 }
