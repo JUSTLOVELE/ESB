@@ -4,7 +4,8 @@
 	3.消息分发
 	4.服务负载均衡，根据权重派发消息，为0则不派发
 	5.流量监控
-	6.webservice接入
+	6.webservice接入 ESBResURLWS
+	https://blog.csdn.net/Simba_cheng/article/details/79156681
 二期:
 	1.做界面
 	2.性能测试
