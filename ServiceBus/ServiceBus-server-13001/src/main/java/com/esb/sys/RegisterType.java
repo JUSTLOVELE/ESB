@@ -11,9 +11,7 @@ public enum RegisterType {
 
 	HTTP(1, "HTTP"),
 	WEBSERVICE(2, "webservice"),
-	FILE(3, "file"),
-	COMPLEX(4, "复合请求"),
-	MESSAGE_SEND(5, "消息分发")
+	SOAP(3, "soap")
 	;
 	private int value;
 	

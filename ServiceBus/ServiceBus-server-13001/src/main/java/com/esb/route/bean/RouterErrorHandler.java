@@ -45,12 +45,12 @@ public class RouterErrorHandler {
 		String siteCode = null;
 		String serviceCode = null;
 		
-		if(heads.containsKey(Constant.Key.SITE_CODE)) {
-			siteCode = (String) heads.get(Constant.Key.SITE_CODE);
+		if(heads.containsKey(Constant.HeadParam.ESB_SITE_CODE)) {
+			siteCode = (String) heads.get(Constant.HeadParam.ESB_SITE_CODE);
 		}
 		
-		if(heads.containsKey(Constant.Key.SERVICE_CODE)) {
-			serviceCode = heads.get(Constant.Key.SERVICE_CODE).toString();
+		if(heads.containsKey(Constant.HeadParam.ESB_SERVICE_CODE)) {
+			serviceCode = heads.get(Constant.HeadParam.ESB_SERVICE_CODE).toString();
 		}
 		
 		entity.setSiteCode(siteCode);
@@ -69,6 +69,24 @@ public class RouterErrorHandler {
 		}
 		
 		exchange.getOut().setBody(data);
+	}
+	
+	/**
+	 * 根据站点生成路由报错(http资源)
+	 * @param exchange
+	 */
+	public void handlerWSRoute(Exchange exchange) {
+		
+		Exception exce = exchange.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class);
+		_logger.info("FromrouteId = " + exchange.getFromRouteId());
+		_logger.info("endpointKey = " + exchange.getFromEndpoint().getEndpointKey());//请求的key,例如:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson
+		_logger.info("endpointuri = " + exchange.getFromEndpoint().getEndpointUri());//例如:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson
+		_logger.info("---RouterErrorHandler.handlerWSRoute,"+exce.getMessage(),exce);
+		Message out = exchange.getOut();
+		Map<String, Object> outheads = out.getHeaders();
+		outheads.put(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY, Constant.HeadParam.END_QUEUE);
+		outheads.put(Constant.HeadParam.ESB_IS_INVOKE, Boolean.valueOf(true));
+		saveExceptionMsg(exchange.getFromRouteId(), exchange.getFromEndpoint().getEndpointKey(), exchange.getFromEndpoint().getEndpointUri(), exce.getMessage(), exchange);
 	}
 	
 	/**

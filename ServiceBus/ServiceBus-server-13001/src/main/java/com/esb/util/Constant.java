@@ -25,11 +25,17 @@ public class Constant {
 
 	public static String Constant_PRIVATE_KEY = "";
 	
+	public static String COMPILE_PATH = null;
+	
 	public static String ENCRYPT_KEY = "";
 	
 	public final static String SUCCESS_SAVE = "保存成功";
 	
 	public final static String SPLIT_SIGN = "&&&&";
+	
+	public final static String COMPILE_BASE_PACKAGENAME = "com.esb.ws";
+	
+	public final static String COMPILE_BASE_PACKAGENAME_PATH = "com/esb/ws";
 	
 	public interface Status {
 		
@@ -89,6 +95,8 @@ public class Constant {
 
 	public interface Key{
 		
+		public String ENDPOINTURI = "endpointURI";
+		
 		public String COUNTINVOKEPRIORITY = "countInvokePriority";
 		
 		public String ENCRYPT_KEY = "ENCRYPT_KEY";
@@ -100,6 +108,8 @@ public class Constant {
 		public String ACTIVEMQ_ADDRESS = "activemqAddress";
 		
 		public String ZOOKEEPER_ADDRESS = "zookeeperAddress";
+		
+		public String COMPILE_PATH = "compilePath";
 		
 		public String PATH_ROOT = "/esb";
 		
@@ -116,6 +126,8 @@ public class Constant {
 		public String SERVICE_CODE = "serviceCode";
 		
 		public String URL = "url";
+		
+		public String CREATEUSEROPID = "createUserOpId";
 		
 		public String TYPE = "type";
 		

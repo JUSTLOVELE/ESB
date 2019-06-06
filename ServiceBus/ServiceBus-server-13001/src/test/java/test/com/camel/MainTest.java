@@ -26,6 +26,8 @@ import net.sf.json.JSONObject;
 
 public class MainTest extends Base{
 	
+	
+	
 	@Test
 	public void binaryImgTest() {
 		

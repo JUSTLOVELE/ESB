@@ -20,4 +20,17 @@ public class RouteUtil {
 		
 		public String DIRECT_PRODUCEHIGH = "direct:produceHigh";
 	}
+	
+	/**
+	 * 获取路由ID
+	 * @param root
+	 * @param siteCode
+	 * @param serviceCode
+	 * @return
+	 */
+	public static String getRouteId(String root, String siteCode, String serviceCode) {
+		
+		String routeId = root + "_" + siteCode + "_" + serviceCode;
+		return routeId;
+	}
 }

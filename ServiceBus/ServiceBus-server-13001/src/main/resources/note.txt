@@ -1,11 +1,10 @@
 一期:
-	1.xml代码测试
+	1.xml格式和两个参数的webservice,还有异常测试
 	2.写文档
 	3.消息分发
 	4.服务负载均衡，根据权重派发消息，为0则不派发
 	5.流量监控
-	6.webservice接入 ESBResURLWS
-	https://blog.csdn.net/Simba_cheng/article/details/79156681
+	6.soap节点
 二期:
 	1.做界面
 	2.性能测试

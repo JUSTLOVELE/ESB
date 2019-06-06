@@ -19,10 +19,53 @@ import org.junit.Test;
 
 import com.esb.core.Base;
 import com.esb.util.Constant;
+import com.esb.util.encrypt.RSA;
 
 import net.sf.json.JSONObject;
 
 public class RegisterJsonTest extends Base{
+	
+	/**
+	 * 一个参数测试
+	 */
+	@Test
+	public void registerWithOneParamJsonWebServiceTest() {
+		
+		try {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put(Constant.Key.SITE_CODE, "350003");
+			map.put(Constant.Key.SERVICE_CODE, "WebService");
+			map.put(Constant.Key.URL, "http://localhost:9001/HelloWorld?wsdl");
+			map.put(Constant.Key.TYPE, 2);
+			List<Map<String, Object>> params = new ArrayList<Map<String, Object>>();
+			Map<String, Object> p = new HashMap<String, Object>();
+			p.put("key", "s");
+			p.put("type", 1);
+			params.add(p);
+			map.put(Constant.Key.PARAMS, params);
+			String param = getJSON(map);
+			System.out.println(param);
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			String token = "test" + Constant.SPLIT_SIGN + "123456";
+			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
+			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
+			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
+			StringEntity entity = new StringEntity("param=" + param, "utf-8");
+          //  entity.setContentType("application/json;charset=UTF-8");
+            entity.setContentEncoding("utf-8");
+            entity.setContentType("application/x-www-form-urlencoded");  
+	        post.setEntity(entity);
+	        HttpResponse httpResponse = httpClient.execute(post);
+	        httpResponse.setHeader("Content-Type", "text/plain;charset=utf-8");
+	        String s = EntityUtils.toString(httpResponse.getEntity(), "utf-8");
+	        System.out.println(s);
+	        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * 二进制文件注册
@@ -41,6 +84,9 @@ public class RegisterJsonTest extends Base{
 			System.out.println(param);
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			String token = "test" + Constant.SPLIT_SIGN + "123456";
+			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
+			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
 			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
 			StringEntity entity = new StringEntity("param=" + param, "utf-8");
           //  entity.setContentType("application/json;charset=UTF-8");
@@ -86,6 +132,9 @@ public class RegisterJsonTest extends Base{
 			System.out.println(param);
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			String token = "test" + Constant.SPLIT_SIGN + "123456";
+			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
+			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
 			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
 			StringEntity entity = new StringEntity("param=" + param, "utf-8");
           //  entity.setContentType("application/json;charset=UTF-8");
@@ -131,6 +180,9 @@ public class RegisterJsonTest extends Base{
 			System.out.println(param);
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			String token = "test" + Constant.SPLIT_SIGN + "123456";
+			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
+			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
 			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
 			StringEntity entity = new StringEntity("param=" + param, "utf-8");
           //  entity.setContentType("application/json;charset=UTF-8");
@@ -170,6 +222,9 @@ public class RegisterJsonTest extends Base{
 			System.out.println(param);
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			String token = "test" + Constant.SPLIT_SIGN + "123456";
+			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
+			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
 			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
 			StringEntity entity = new StringEntity("param=" + param, "utf-8");
           //  entity.setContentType("application/json;charset=UTF-8");
@@ -206,6 +261,9 @@ public class RegisterJsonTest extends Base{
 			System.out.println(param);
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			String token = "test" + Constant.SPLIT_SIGN + "123456";
+			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
+			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
 			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
 			StringEntity entity = new StringEntity("param=" + param, "utf-8");
           //  entity.setContentType("application/json;charset=UTF-8");

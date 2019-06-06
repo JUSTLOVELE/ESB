@@ -52,6 +52,7 @@ public class InitStartComponent {
 		Constant.ACTIVEMQ_ADDRESS = Constant.getConstObject(Constant.Key.ACTIVEMQ_ADDRESS);
 		Constant.Constant_PUBLIC_KEY = Constant.getConst(Constant.Key.CONSTANTPUBLICKEY);
 		Constant.Constant_PRIVATE_KEY = Constant.getConst(Constant.Key.CONSTANTPRIVATEKEY);
+		Constant.COMPILE_PATH = Constant.getConst(Constant.Key.COMPILE_PATH);
 		Constant.ENCRYPT_KEY = Constant.getConst(Constant.Key.ENCRYPT_KEY);
 		_logger.info("zookeeper address=" + Constant.ZOOKEEPER_ADDRESS);
 		_logger.info("activemq address=" + Constant.ACTIVEMQ_ADDRESS);

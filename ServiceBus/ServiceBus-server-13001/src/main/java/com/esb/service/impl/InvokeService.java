@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.esb.core.Base;
-import com.esb.sys.ZookeeperOperation;
+import com.esb.entity.EsbUserEntity;
+import com.esb.service.EsbRouteService;
+import com.esb.service.route.RouteUtil;
 import com.esb.util.Constant;
 import com.esb.util.XMLUtil;
 
@@ -25,6 +27,9 @@ public class InvokeService extends Base{
 	
 	@Autowired
 	private ZookeeperServiceImpl _zookeeperService;
+	
+	@Autowired
+	private EsbRouteService _esbRouteService;
 
 	/**
 	 * 
@@ -39,7 +44,7 @@ public class InvokeService extends Base{
 	 * @param param
 	 * @return
 	 */
-	public String registerWithJson(String param) {
+	public String registerWithJson(String param, EsbUserEntity user) {
 		
 		JSONObject json = JSONObject.fromObject(param);
 		
@@ -59,7 +64,7 @@ public class InvokeService extends Base{
 		String serviceCode = json.getString(Constant.Key.SERVICE_CODE);
 		//String url = json.getString(Constant.Key.URL);
 		//int type = json.getInt(Constant.Key.TYPE);
-		param = XMLUtil.parseJSONToRegisterXMLInfo(json);
+		param = XMLUtil.parseJSONToRegisterXMLInfo(json, user);
 		String sitePath = Constant.Key.PATH_ROOT + "/" + siteCode;
 		
 		if(!_zookeeperService.checkExists(sitePath)) {
@@ -79,7 +84,7 @@ public class InvokeService extends Base{
 		return returnGeneralJSONCode(Constant.Status.SUCCESS_CODE, Constant.SUCCESS_SAVE, true);
 	}
 	
-	public String registerWithXML(String param) {
+	public String registerWithXML(String param, EsbUserEntity user) {
 		
 		Element rootElement = XMLUtil.getRootElement(param);
 		Element siteCodeElement = rootElement.getChild(Constant.Key.SITE_CODE);
@@ -103,9 +108,15 @@ public class InvokeService extends Base{
 			return returnErrorCode("type为必填");
 		}
 		
+		Element registerTypeElement = new Element("registerType");
+		registerTypeElement.setText("2");
+		Element createUserOpIdElement = new Element("createUserOpId");
+		createUserOpIdElement.setText(user.getOpId());
+		rootElement.addContent(registerTypeElement);
+		rootElement.addContent(createUserOpIdElement);
+		
 		String siteCode = siteCodeElement.getValue();
 		String serviceCode = serviceCodeElement.getValue();
-		
 		String sitePath = Constant.Key.PATH_ROOT + "/" + siteCode;
 		
 		if(!_zookeeperService.checkExists(sitePath)) {
@@ -117,9 +128,9 @@ public class InvokeService extends Base{
 		String path = Constant.Key.PATH_ROOT + "/" + siteCode + "/" + serviceCode;
 		
 		if(!_zookeeperService.checkExists(path)) {
-			_zookeeperService.createNode(path, CreateMode.PERSISTENT, param);
+			_zookeeperService.createNode(path, CreateMode.PERSISTENT, rootElement.toString());
 		}else {
-			_zookeeperService.updateNodeDate(path, param);
+			_zookeeperService.updateNodeDate(path, rootElement.toString());
 		}
 		
 		return returnGeneralJSONCode(Constant.Status.SUCCESS_CODE, Constant.SUCCESS_SAVE, true);

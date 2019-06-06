@@ -54,15 +54,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
-		<!-- 修改后立即生效，热部署 -->
-		<dependency>
+		<!-- 修改后立即生效，热部署 ,不能使用热部署,因为ESB会新建class-->
+<!-- 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>springloaded</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
@@ -167,11 +167,27 @@
 			<artifactId>activemq-camel</artifactId>
 			<version>5.15.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-cxf</artifactId>
+			<version>3.0.0-M2</version>
+		</dependency>
+		<!-- 2019.6.6 -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-tools-wsdlto-core</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+<!-- 		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http-jetty</artifactId>
+			<version>3.3.1</version>
+		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/jdom/jdom -->
 		<dependency>
-		    <groupId>jdom</groupId>
-		    <artifactId>jdom</artifactId>
-		    <version>1.1</version>
+			<groupId>jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.1</version>
 		</dependency>
 	</dependencies>
 	<build>

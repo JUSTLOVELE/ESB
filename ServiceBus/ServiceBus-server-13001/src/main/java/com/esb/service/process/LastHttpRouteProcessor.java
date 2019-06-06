@@ -2,6 +2,7 @@ package com.esb.service.process;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public class LastHttpRouteProcessor implements Processor{
 				for(int i=0; i<array.size(); i++) {
 					
 					JSONObject param = array.getJSONObject(i);
-					Map<String, Object> m = new HashMap<String, Object>();
+					Map<String, Object> m = new LinkedHashMap<String, Object>();
 					m.put(Constant.Key.VALUE, param.get(Constant.Key.VALUE));
 					m.put(Constant.Key.KEY, param.get(Constant.Key.KEY));
 					params.add(m);
@@ -78,7 +79,7 @@ public class LastHttpRouteProcessor implements Processor{
 				
 				for(Element param: paramElements) {
 					
-					Map<String, Object> m = new HashMap<String, Object>();
+					Map<String, Object> m = new LinkedHashMap<String, Object>();
 					m.put(Constant.Key.VALUE, param.getChild(Constant.Key.VALUE).getValue());
 					m.put(Constant.Key.KEY, param.getChild(Constant.Key.KEY).getValue());
 					params.add(m);

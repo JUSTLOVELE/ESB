@@ -1,8 +1,6 @@
 package com.esb.service.process;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.esb.core.Base;
 import com.esb.entity.EsbSuccessEntity;
-import com.esb.entity.EsbUserEntity;
 import com.esb.service.EsbSuccessService;
 import com.esb.sys.InvokeDataType;
 import com.esb.util.Constant;

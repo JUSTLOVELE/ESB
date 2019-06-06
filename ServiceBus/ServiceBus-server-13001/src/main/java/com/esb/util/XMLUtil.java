@@ -3,6 +3,7 @@ package com.esb.util;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,8 @@ import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+
+import com.esb.entity.EsbUserEntity;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -33,6 +36,7 @@ public class XMLUtil {
 		Element serviceCodeElement = root.getChild(Constant.Key.SERVICE_CODE);
 		Element urlElement = root.getChild(Constant.Key.URL);
 		Element typeElement = root.getChild(Constant.Key.TYPE);
+		Element userElement = root.getChild(Constant.Key.CREATEUSEROPID);
 		List<Element> paramElements = root.getChildren(Constant.Key.PARAMS);
 		List<Map<String, Object>> params = null;
 		
@@ -42,7 +46,7 @@ public class XMLUtil {
 			
 			for(Element param: paramElements) {
 				
-				Map<String, Object> m = new HashMap<String, Object>();
+				Map<String, Object> m = new LinkedHashMap<String, Object>();
 				m.put(Constant.Key.TYPE, Integer.valueOf(param.getChild(Constant.Key.TYPE).getValue()));
 				m.put(Constant.Key.KEY, param.getChild(Constant.Key.KEY).getValue());
 				params.add(m);
@@ -55,6 +59,7 @@ public class XMLUtil {
 		map.put(Constant.Key.URL, urlElement.getValue());
 		map.put(Constant.Key.TYPE, Integer.valueOf(typeElement.getValue()));
 		map.put(Constant.Key.PARAMS, params);
+		map.put(Constant.Key.CREATEUSEROPID, userElement.getValue());
 		
 		return map;
 	}
@@ -99,13 +104,14 @@ public class XMLUtil {
 	 * @param json
 	 * @return
 	 */
-	public static String parseJSONToRegisterXMLInfo(JSONObject json) {
+	public static String parseJSONToRegisterXMLInfo(JSONObject json, EsbUserEntity user) {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("<root>");
 		sb.append("<siteCode><![CDATA[" + json.getString(Constant.Key.SITE_CODE) + "]]></siteCode>");
 		sb.append("<serviceCode><![CDATA[" + json.getString(Constant.Key.SERVICE_CODE) + "]]></serviceCode>");
 		sb.append("<url><![CDATA[" + json.getString(Constant.Key.URL) + "]]></url>");
+		sb.append("<createUserOpId>" + user.getOpId() + "</createUserOpId>");
 		sb.append("<type><![CDATA[" + json.getInt(Constant.Key.TYPE) + "]]></type>");
 		sb.append("<registerType>1</registerType>");
 		

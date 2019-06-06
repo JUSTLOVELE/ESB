@@ -33,8 +33,8 @@ public class InvokeActionTest extends Base{
 		
 		map.put(Constant.Key.PARAMS, params);
 		String param = getJSON(map);
-		String s = _invokeAction.registerWithJson(param);
-		System.out.println(s);
+		//String s = _invokeAction.registerWithJson(param);
+		//System.out.println(s);
 	}
 	
 }
