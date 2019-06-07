@@ -41,6 +41,9 @@ public class EsbSuccessEntity implements Serializable{
 	@Column(name = "esb_flow", length = 20)
 	private Integer esbFlow;
 	
+	@Column(name = "route_id", length = 128)
+	private String routeId;
+	
 	public EsbSuccessEntity() {
 		
 	}
@@ -56,6 +59,16 @@ public class EsbSuccessEntity implements Serializable{
 		this.esbFlow = esbFlow;
 	}
 
+
+
+	public String getRouteId() {
+		return routeId;
+	}
+
+
+	public void setRouteId(String routeId) {
+		this.routeId = routeId;
+	}
 
 
 	public String getOpId() {

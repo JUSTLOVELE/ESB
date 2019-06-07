@@ -5,7 +5,9 @@ import java.util.Map;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.ExchangePattern;
+import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import com.esb.service.EsbWsService;
 import com.esb.service.InitRouteInfoService;
 import com.esb.service.process.EndRouteProcessor;
 import com.esb.service.process.LastHttpRouteProcessor;
+import com.esb.service.process.LastWsRouteProcessor;
 import com.esb.service.route.RouteUtil;
 import com.esb.sys.RegisterType;
 import com.esb.util.Constant;
@@ -47,6 +50,9 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 	
 	@Autowired
 	private EsbRouteServiceImpl _esbRouteService;
+	
+	@Autowired
+	private LastWsRouteProcessor _lastWsRouteProcessor;
 	
 	private final static Log _logger = LogFactory.getLog(InitRouteInfoServiceImpl.class);
 	
@@ -79,9 +85,11 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 				
 				errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerWSRoute"));
 				from(route)
-				.process(_lastHttpRouteProcessor)
+				.routeId(routeId)
+				.process(_lastWsRouteProcessor)
 				.to(ExchangePattern.InOut, cxfEndpoint)
-				.process(_endRouteProcessor).routeId(routeId);
+				.process(_endRouteProcessor)
+				.end();
 			}
 		});
 		
@@ -166,7 +174,13 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			String route = "direct:" + root + "_" + siteCode + "_" + serviceCode;
 			String routeId = RouteUtil.getRouteId(root, siteCode, serviceCode);
 			_logger.info(route);
-			_camelContext.removeRoute(routeId);
+			_camelContext.getRouteController().stopRoute(routeId);
+			boolean isRemoveRoute = _camelContext.removeRoute(routeId);
+			
+			if(!isRemoveRoute) {
+				throw new RuntimeCamelException("删除camel路由失败");
+			}
+			
 			_esbRouteService.deleteRouteInfo(routeId);
 			addRoute(route, routeId, data, siteCode, serviceCode);
 			
@@ -190,8 +204,13 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			String route = "direct:" + root + "_" + siteCode + "_" + serviceCode;
 			String routeId = RouteUtil.getRouteId(root, siteCode, serviceCode);
 			_logger.info(route);
-			_camelContext.removeRoute(routeId);
+			_camelContext.getRouteController().stopRoute(routeId);
+			boolean isRemoveRoute = _camelContext.removeRoute(routeId);
 			_esbRouteService.deleteRouteInfo(routeId);
+			
+			if(!isRemoveRoute) {
+				throw new RuntimeCamelException("删除camel路由失败");
+			}
 			
 		} catch (Exception e) {
 			_logger.error("", e);

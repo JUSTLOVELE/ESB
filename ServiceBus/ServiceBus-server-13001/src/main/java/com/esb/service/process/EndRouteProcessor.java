@@ -1,11 +1,16 @@
 package com.esb.service.process;
 
+import static org.mockito.Matchers.endsWith;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.activation.DataHandler;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
+import org.apache.camel.RuntimeCamelException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +41,10 @@ public class EndRouteProcessor extends Base implements Processor{
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
+		
 		Message in = exchange.getIn();
 		Map<String, Object> heads = in.getHeaders();
 		String data = exchange.getIn().getBody(String.class);
-		_logger.info("data = " + data);
-		String outData = exchange.getOut().getBody(String.class);
-		_logger.info("outData = " + outData);
 		Message out = exchange.getOut();
 		Map<String, Object> outheads = out.getHeaders();
 		//要把调用的头信息和注册的头信息加入到返回的头参数中
@@ -90,6 +93,7 @@ public class EndRouteProcessor extends Base implements Processor{
 				heads.get(Constant.HeadParam.ESB_SITE_CODE).toString(), 
 				heads.get(Constant.HeadParam.ESB_SERVICE_CODE).toString(), 
 				data.getBytes().length);
+		e.setRouteId(exchange.getFromRouteId());
 		_esbSuccessService.saveEsbSuccessEntity(e);
 	}
 }

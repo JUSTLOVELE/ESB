@@ -8,8 +8,10 @@ import javax.xml.ws.Endpoint;
 public class PublishWebService {
 
 	@WebMethod
-	public String sayHello(String s) {
-		return "{\"data\":\"" + s + "\"}";
+	public String sayHello(String s, String t) {
+		
+		String a = s + ";" + t;
+		return "{\"data\":\"" + a + "\"}";
 	}
 	
 	public static void main(String[] args) {

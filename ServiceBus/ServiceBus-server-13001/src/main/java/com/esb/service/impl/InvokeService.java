@@ -30,6 +30,38 @@ public class InvokeService extends Base{
 	
 	@Autowired
 	private EsbRouteService _esbRouteService;
+	
+	/**
+	 * 删除ESB服务
+	 * @param param
+	 * @param user
+	 * @return
+	 */
+	public String removeESBService(String param, EsbUserEntity user) {
+		
+		JSONObject json = JSONObject.fromObject(param);
+		
+		if(!json.containsKey(Constant.Key.SITE_CODE)) {
+			return returnErrorCode("siteCode为必填项目");
+		}
+		
+		if(!json.containsKey(Constant.Key.SERVICE_CODE)) {
+			return returnErrorCode("serviceCode为必填项目");
+		}
+		
+		String userOpId = user.getOpId();
+		String siteCode = json.getString(Constant.Key.SITE_CODE);
+		String serviceCode = json.getString(Constant.Key.SERVICE_CODE);
+		if(_esbRouteService.queryisExistRoute(userOpId, siteCode, serviceCode)) {
+			
+			String path = RouteUtil.getServicePath(siteCode, serviceCode);
+			_zookeeperService.deleteNode(path);
+			return returnGeneralJSONCode(Constant.Status.SUCCESS_CODE, "删除成功", true);
+		}else {
+			return returnErrorCode("无权删除该服务");
+		}
+	}
+	
 
 	/**
 	 * 
@@ -65,7 +97,7 @@ public class InvokeService extends Base{
 		//String url = json.getString(Constant.Key.URL);
 		//int type = json.getInt(Constant.Key.TYPE);
 		param = XMLUtil.parseJSONToRegisterXMLInfo(json, user);
-		String sitePath = Constant.Key.PATH_ROOT + "/" + siteCode;
+		String sitePath = RouteUtil.getSitePath(siteCode);
 		
 		if(!_zookeeperService.checkExists(sitePath)) {
 			
@@ -73,7 +105,7 @@ public class InvokeService extends Base{
 			_zookeeperService.registerPathChildListener(sitePath);
 		}
 		
-		String path = Constant.Key.PATH_ROOT + "/" + siteCode + "/" + serviceCode;
+		String path = RouteUtil.getServicePath(siteCode, serviceCode);
 		
 		if(!_zookeeperService.checkExists(path)) {
 			_zookeeperService.createNode(path, CreateMode.PERSISTENT, param);
@@ -117,7 +149,7 @@ public class InvokeService extends Base{
 		
 		String siteCode = siteCodeElement.getValue();
 		String serviceCode = serviceCodeElement.getValue();
-		String sitePath = Constant.Key.PATH_ROOT + "/" + siteCode;
+		String sitePath = RouteUtil.getSitePath(siteCode);
 		
 		if(!_zookeeperService.checkExists(sitePath)) {
 			
@@ -125,7 +157,7 @@ public class InvokeService extends Base{
 			_zookeeperService.registerPathChildListener(sitePath);
 		}
 		
-		String path = Constant.Key.PATH_ROOT + "/" + siteCode + "/" + serviceCode;
+		String path = RouteUtil.getServicePath(siteCode, serviceCode);
 		
 		if(!_zookeeperService.checkExists(path)) {
 			_zookeeperService.createNode(path, CreateMode.PERSISTENT, rootElement.toString());

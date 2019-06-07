@@ -2,7 +2,6 @@ package com.esb.view.api;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.camel.RuntimeCamelException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +34,8 @@ public class InvokeAction extends Base{
 	@Autowired
 	private UserService _userService;
 	
+	private final static Log _logger = LogFactory.getLog(InvokeAction.class);
+	
 	private EsbUserEntity getUser(String token) {
 		
 		token = RSA.decryptByPrivate(token, Constant.Constant_PRIVATE_KEY);
@@ -53,7 +54,27 @@ public class InvokeAction extends Base{
 		return user;
 	}
 	
-	private final static Log _logger = LogFactory.getLog(InvokeAction.class);
+	@ResponseBody
+	@RequestMapping(value="/removeESBService", produces="application/json; charset=utf-8")
+	public String removeESBService(String param, HttpServletRequest request) {
+		
+		_logger.info(param);
+		EsbUserEntity user = null;
+		
+		try {
+			user = getUser(request.getHeader(Constant.HeadParam.AUTHORIZATION));
+			
+			if(user == null) {
+				return JSONUtil.errorReturn("token无效");
+			}
+			
+			return _invokeService.removeESBService(param, user);
+			
+		} catch (Exception e) {
+			_logger.error("", e);
+			return JSONUtil.errorReturn(e.getMessage());
+		}
+	}
 	
 	@RequestMapping(value="/registerWithJson", produces = "application/json; charset=utf-8")
 	@ResponseBody
@@ -97,11 +118,5 @@ public class InvokeAction extends Base{
 		}
 		
 		return _invokeService.registerWithXML(param, user);
-	}
-	
-	@RequestMapping(value = "/helloworld", produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public String helloworld() {
-		return "无参数测试";
 	}
 }

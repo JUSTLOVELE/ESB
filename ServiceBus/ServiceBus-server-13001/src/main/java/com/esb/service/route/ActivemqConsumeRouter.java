@@ -19,7 +19,7 @@ public class ActivemqConsumeRouter extends RouteBuilder{
 	public void configure() throws Exception {
 		
 		errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerActivemqConsumeRouter"));
-		from(RouteUtil.invokeNormalQueueEndpointConsume).routeId(Constant.RouteId.CONSUME_ACTIVEMQ_NORMAL).dynamicRouter(method(DynamicRouter.class, "selectRoute"));
+		from(RouteUtil.invokeNormalQueueEndpointConsume).dynamicRouter(method(DynamicRouter.class, "selectRoute")).routeId(Constant.RouteId.CONSUME_ACTIVEMQ_NORMAL);
 		//from(RouteUtil.invokeHighQueueEndpointConsume);
 	}
 

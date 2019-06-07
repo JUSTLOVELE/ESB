@@ -104,11 +104,17 @@ public class EsbRouteServiceImpl extends BaseRes implements EsbRouteService {
 			Endpoint endpoint = _camelContext.getEndpoint(endpointURI);
 			
 			try {
+				endpoint.stop();
 				_camelContext.removeEndpoint(endpoint);
 			} catch (Exception e) {
 				_logger.error("", e);
 			}
 		}
+	}
+
+	@Override
+	public boolean queryisExistRoute(String userOpId, String siteCode, String serviceCode) {
+		return _esbRouteDao.queryisExistRoute(userOpId, siteCode, serviceCode);
 	}
 
 }

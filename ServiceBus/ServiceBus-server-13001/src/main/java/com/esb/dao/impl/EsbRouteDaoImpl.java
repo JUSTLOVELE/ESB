@@ -66,4 +66,18 @@ public class EsbRouteDaoImpl extends BaseDao implements EsbRouteDao {
 		return this.getJdbcTemplate().queryForList(sql, new Object[] {routeId});
 	}
 
+	@Override
+	public boolean queryisExistRoute(String userOpId, String siteCode, String serviceCode) {
+		
+		String sql = "SELECT COUNT(*) num FROM esb_route_tbl a WHERE a.`create_user_op_id` = ? AND a.`site_code` = ? AND a.`service_code` = ?";
+		_logger.info(sql);
+		Integer num = this.getJdbcTemplate().queryForObject(sql, new Object[] {userOpId, siteCode, serviceCode}, Integer.class);
+		
+		if(num == 0) {
+			return false;
+		}else {
+			return true;
+		}
+	}
+
 }

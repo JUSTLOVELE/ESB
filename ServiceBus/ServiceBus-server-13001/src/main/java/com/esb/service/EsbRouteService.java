@@ -11,6 +11,14 @@ import com.esb.entity.EsbRouteEntity;
  */
 public interface EsbRouteService {
 	
+	
+	/**
+	 * 判断这个路由ID对应的路由是否存在
+	 * @param routeId
+	 * @return
+	 */
+	public boolean queryisExistRoute(String userOpId, String siteCode, String serviceCode);
+	
 	/**
 	 * 根据路由ID删除
 	 * @param routeId

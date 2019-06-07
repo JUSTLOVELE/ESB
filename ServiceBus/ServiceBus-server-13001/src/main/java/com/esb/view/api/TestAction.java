@@ -1,9 +1,6 @@
 package com.esb.view.api;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,8 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.esb.core.Base;
 import com.esb.util.JSONUtil;
-
-import net.sf.json.JSONObject;
 
 /**
  * @Description:测试类
@@ -84,5 +79,11 @@ public class TestAction extends Base{
 		
 		String s= "arg0=" + arg0 + ";arg1=" + arg1;
 		return s;
+	}
+	
+	@RequestMapping(value = "/helloworld", produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String helloworld() {
+		return "无参数测试";
 	}
 }

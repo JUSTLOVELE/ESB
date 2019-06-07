@@ -1,5 +1,7 @@
 package com.esb.service.route;
 
+import com.esb.util.Constant;
+
 public class RouteUtil {
 	
 	public final static String HTTP_INVOKE_JSON_ADDRESS = "netty4-http:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson";
@@ -19,6 +21,14 @@ public class RouteUtil {
 		public String DIRECT_PRODUCENORMAL = "direct:produceNormal";
 		
 		public String DIRECT_PRODUCEHIGH = "direct:produceHigh";
+	}
+	
+	public static String getServicePath(String siteCode, String serviceCode) {
+		return Constant.Key.PATH_ROOT + "/" + siteCode + "/" + serviceCode;
+	}
+	
+	public static String getSitePath(String siteCode) {
+		return Constant.Key.PATH_ROOT + "/" + siteCode;
 	}
 	
 	/**

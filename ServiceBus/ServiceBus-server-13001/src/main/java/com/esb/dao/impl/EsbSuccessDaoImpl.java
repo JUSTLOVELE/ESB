@@ -29,9 +29,9 @@ public class EsbSuccessDaoImpl extends BaseDao implements EsbSuccessDao {
 		String date = DateUtil.parseDateToStr(new Date(), DateUtil.DATE_TIME_FORMAT_YYYY_MM_DD_HH_MI_SS);
 		StringBuffer sb = new StringBuffer();
 		sb.append("insert into esb_success_tbl ");
-		sb.append("(op_id, create_date, site_code, service_code, esb_flow, user_op_id)");
+		sb.append("(op_id, create_date, site_code, service_code, esb_flow, user_op_id, route_id)");
 		sb.append("value('" + e.getOpId() + "',str_to_date('" + date + "', '%Y-%m-%d %H:%i:%s'),'" + e.getSiteCode() + 
-				"','" + e.getServiceCode() +"', " + e.getEsbFlow() + ",'" + e.getUserOpId() + "')");
+				"','" + e.getServiceCode() +"', " + e.getEsbFlow() + ",'" + e.getUserOpId() + "', '" + e.getRouteId() + "')");
 		String sql = sb.toString();
 		_logger.info(sql);
 		

@@ -1,6 +1,9 @@
 package com.esb;
 
+import java.util.List;
+
 import org.apache.camel.CamelContext;
+import org.apache.camel.Route;
 import org.apache.camel.spi.Registry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -83,6 +86,19 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 			}
 			
 			_zookeeperService.initCreateZookeeperService();
+//			List<Route> routes = _camelContext.getRoutes();
+//			
+//			for(Route r: routes) {
+//				System.out.println(r.getId());
+//				System.out.println(r.getEndpoint().getEndpointUri());
+//			}
+//			
+//			Route route = _camelContext.getRoute("esb_350003_WebService");
+//			_camelContext.getRouteController().stopRoute("esb_350003_WebService");
+//			boolean s = _camelContext.removeRoute("esb_350003_WebService");
+//			System.out.println(s);
+//			Route a = _camelContext.getRoute("esb_350003_WebService");
+//			System.out.println(a);
 			
 		} catch (Exception e) {
 			_logger.error("", e);

@@ -15,6 +15,13 @@ import com.esb.entity.EsbRouteEntity;
 public interface EsbRouteDao {
 	
 	/**
+	 * 判断这个路由ID对应的路由是否存在
+	 * @param routeId
+	 * @return
+	 */
+	public boolean queryisExistRoute(String userOpId, String siteCode, String serviceCode);
+	
+	/**
 	 * 查询路由信息
 	 * @param routeId
 	 * @return
