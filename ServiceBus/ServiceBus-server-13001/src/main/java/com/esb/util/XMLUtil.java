@@ -37,6 +37,7 @@ public class XMLUtil {
 		Element urlElement = root.getChild(Constant.Key.URL);
 		Element typeElement = root.getChild(Constant.Key.TYPE);
 		Element userElement = root.getChild(Constant.Key.CREATEUSEROPID);
+		Element soapElement = root.getChild(Constant.Key.SOAP);
 		List<Element> paramElements = root.getChildren(Constant.Key.PARAMS);
 		List<Map<String, Object>> params = null;
 		
@@ -60,6 +61,11 @@ public class XMLUtil {
 		map.put(Constant.Key.TYPE, Integer.valueOf(typeElement.getValue()));
 		map.put(Constant.Key.PARAMS, params);
 		map.put(Constant.Key.CREATEUSEROPID, userElement.getValue());
+		
+		if(soapElement != null) {
+			map.put(Constant.Key.SOAP, soapElement.getValue());
+		}
+		
 		
 		return map;
 	}

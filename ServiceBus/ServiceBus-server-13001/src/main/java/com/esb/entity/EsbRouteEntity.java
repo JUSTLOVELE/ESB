@@ -40,6 +40,9 @@ public class EsbRouteEntity implements Serializable{
 	@Column(name = "service_code", length = 128)
 	private String serviceCode;
 	
+	@Column(name = "route_type", length=1)
+	private Integer routeType;
+	
 	public EsbRouteEntity() {
 		
 	}
@@ -102,5 +105,13 @@ public class EsbRouteEntity implements Serializable{
 
 	public void setServiceCode(String serviceCode) {
 		this.serviceCode = serviceCode;
+	}
+
+	public Integer getRouteType() {
+		return routeType;
+	}
+
+	public void setRouteType(Integer routeType) {
+		this.routeType = routeType;
 	}
 }

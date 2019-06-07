@@ -68,6 +68,8 @@ public class Constant {
 		
 		public String ESB_SERVICE_CODE = "esb_service_code";
 		
+		public String ESB_ROUTE_ID = "esb_route_id";
+		
 		public String ESB_OFFLINE = "esb_offline";
 		
 		public String ESB_PARAMS = "esb_params";
@@ -96,6 +98,8 @@ public class Constant {
 	public interface Key{
 		
 		public String ENDPOINTURI = "endpointURI";
+		
+		public String ROUTE_TYPE = "routeType";
 		
 		public String COUNTINVOKEPRIORITY = "countInvokePriority";
 		
@@ -128,6 +132,8 @@ public class Constant {
 		public String URL = "url";
 		
 		public String CREATEUSEROPID = "createUserOpId";
+		
+		public String SOAP = "soap";
 		
 		public String TYPE = "type";
 		

@@ -1,16 +1,11 @@
 package com.esb.service.process;
 
-import static org.mockito.Matchers.endsWith;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.activation.DataHandler;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
-import org.apache.camel.RuntimeCamelException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.esb.core.Base;
 import com.esb.entity.EsbSuccessEntity;
 import com.esb.service.EsbSuccessService;
+import com.esb.service.route.RouteUtil;
 import com.esb.sys.InvokeDataType;
 import com.esb.util.Constant;
 import com.esb.util.UUIDUtil;
@@ -41,9 +37,9 @@ public class EndRouteProcessor extends Base implements Processor{
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
-		
 		Message in = exchange.getIn();
 		Map<String, Object> heads = in.getHeaders();
+		heads.put(Constant.HeadParam.ESB_ROUTE_ID, Constant.HeadParam.ESB_ROUTE_ID);
 		String data = exchange.getIn().getBody(String.class);
 		Message out = exchange.getOut();
 		Map<String, Object> outheads = out.getHeaders();
@@ -93,7 +89,9 @@ public class EndRouteProcessor extends Base implements Processor{
 				heads.get(Constant.HeadParam.ESB_SITE_CODE).toString(), 
 				heads.get(Constant.HeadParam.ESB_SERVICE_CODE).toString(), 
 				data.getBytes().length);
-		e.setRouteId(exchange.getFromRouteId());
+		String siteCode = heads.get(Constant.HeadParam.ESB_SITE_CODE).toString();
+		String serviceCode = heads.get(Constant.HeadParam.ESB_SERVICE_CODE).toString();
+		e.setRouteId(RouteUtil.getRouteId(Constant.Key.PATH_ESB, siteCode, serviceCode));
 		_esbSuccessService.saveEsbSuccessEntity(e);
 	}
 }

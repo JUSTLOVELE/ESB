@@ -61,7 +61,7 @@ public class EsbRouteDaoImpl extends BaseDao implements EsbRouteDao {
 	@Override
 	public List<Map<String, Object>> queryRoute(String routeId) {
 		
-		String sql = "SELECT a.`endpoint_uri` endpointURI, site_code siteCode, service_code serviceCode FROM esb_route_tbl a WHERE a.`route_id` = ?";
+		String sql = "SELECT a.`endpoint_uri` endpointURI, site_code siteCode, service_code serviceCode,route_type routeType FROM esb_route_tbl a WHERE a.`route_id` = ?";
 		_logger.info(sql);
 		return this.getJdbcTemplate().queryForList(sql, new Object[] {routeId});
 	}

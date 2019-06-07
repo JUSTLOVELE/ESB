@@ -7,20 +7,20 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.esb.entity.EsbRouteEntity;
-import com.esb.service.EsbRouteService;
 import com.esb.service.EsbWsService;
 import com.esb.service.InitRouteInfoService;
 import com.esb.service.process.EndRouteProcessor;
 import com.esb.service.process.LastHttpRouteProcessor;
+import com.esb.service.process.LastSoapRouteProcessor;
 import com.esb.service.process.LastWsRouteProcessor;
 import com.esb.service.route.RouteUtil;
+import com.esb.sys.InvokeDataType;
 import com.esb.sys.RegisterType;
 import com.esb.util.Constant;
 import com.esb.util.UUIDUtil;
@@ -54,24 +54,66 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 	@Autowired
 	private LastWsRouteProcessor _lastWsRouteProcessor;
 	
+	@Autowired
+	private LastSoapRouteProcessor _lastSoapRouteProcessor;
+	
 	private final static Log _logger = LogFactory.getLog(InitRouteInfoServiceImpl.class);
 	
-	private void saveRoute(String routeId, String endpointUri, String createUserOpId, String siteCode, String serviceCode) {
+	private void saveRoute(String routeId, String endpointUri, String createUserOpId, String siteCode, String serviceCode, int type) {
 		
 		EsbRouteEntity e = new EsbRouteEntity(UUIDUtil.getUUID(), routeId, endpointUri, createUserOpId, siteCode, serviceCode);
+		e.setRouteType(type);
 		_esbRouteService.saveEsbRouteEntity(e);
 	}
 	
-	private void addWebService(String route, String routeId, String wsdlAddress, String siteCode, String serviceCode, String createUserOpId) throws Exception {
+	private void addSoap(String route, String routeId, String wsdlAddress, String siteCode, String serviceCode, String createUserOpId) throws Exception {
 		
-		_logger.info("addWebService = " + routeId);
+		_logger.info("addSoap = " + routeId);
+		removeCamelEndPoint(routeId);
+		int index = wsdlAddress.lastIndexOf("?");
+		String serviceURL = wsdlAddress.substring(0, index);//去掉wsdl
+		String uri = "cxf:"  
+				+ serviceURL //service address  
+				+ "?"  
+				+ "wsdlURL=" + wsdlAddress    //wsdl url 
+				+ "&"  
+				+ "dataFormat=RAW";
+		
+		_camelContext.addRoutes(new RouteBuilder() {
+			
+			@Override
+			public void configure() throws Exception {
+				
+				errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerSoapRoute"));
+				from(route).routeId(routeId)
+				.process(_lastSoapRouteProcessor)
+				.to(ExchangePattern.InOut, uri)
+				.convertBodyTo(String.class)
+				.process(_endRouteProcessor).end();
+			}
+		});
+		
+		saveRoute(routeId, uri, createUserOpId, siteCode, serviceCode, RegisterType.HTTP.getValue());
+	
+	}
+	
+	/**
+	 * 移除路由,不影响进程
+	 * @param routeId
+	 */
+	private void removeCamelEndPoint(String routeId) {
 		
 		try {
 			_esbRouteService.removeCamelEndPoint(routeId);
 		} catch (Exception e) {
 			_logger.error("", e);
 		}
+	}
+	
+	private void addWebService(String route, String routeId, String wsdlAddress, String siteCode, String serviceCode, String createUserOpId) throws Exception {
 		
+		_logger.info("addWebService = " + routeId);
+		removeCamelEndPoint(routeId);
 		Endpoint cxfEndpoint = _esbWsService.createCxfEndpoinf(wsdlAddress, siteCode, serviceCode);
 		
 		if(cxfEndpoint == null) {
@@ -93,12 +135,13 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			}
 		});
 		
-		saveRoute(routeId, cxfEndpoint.getEndpointUri(), createUserOpId, siteCode, serviceCode);
+		saveRoute(routeId, cxfEndpoint.getEndpointUri(), createUserOpId, siteCode, serviceCode, RegisterType.WEBSERVICE.getValue());
 	}
 	
 	private void addHttp(String route, String routeId, String url, String siteCode, String serviceCode, String createUserOpId) throws Exception {
 		
 		_logger.info("addHttpRoute = " + routeId);
+		removeCamelEndPoint(routeId);
 		_camelContext.addRoutes(new RouteBuilder() {
 			
 			@Override
@@ -112,7 +155,7 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			}
 		});
 		
-		saveRoute(routeId, url + "?bridgeEndpoint=true&throwExceptionOnFailure=false", createUserOpId, siteCode, serviceCode);
+		saveRoute(routeId, url + "?bridgeEndpoint=true&throwExceptionOnFailure=false", createUserOpId, siteCode, serviceCode, RegisterType.HTTP.getValue());
 	}
 	
 	private void addRoute(String route, String routeId, String data, String siteCode, String serviceCode) throws Exception {
@@ -132,6 +175,7 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			break;
 			
 		case SOAP:
+			addSoap(route, routeId, url, siteCode, serviceCode, createUserOpId);
 			break;
 			
 		default:

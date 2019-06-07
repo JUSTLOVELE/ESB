@@ -1,7 +1,6 @@
 package com.esb.service.process;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +99,7 @@ public class LastHttpRouteProcessor implements Processor{
 		//Map<String, Object> esbHeadInvoke = (Map<String, Object>) head.get(Constant.Key.ESB_HEAD_INVOKE);
 		String siteCode = head.get(Constant.HeadParam.ESB_SITE_CODE).toString();
 		String serviceCode = head.get(Constant.HeadParam.ESB_SERVICE_CODE).toString();
+		head.put(Constant.HeadParam.ESB_ROUTE_ID, Constant.HeadParam.ESB_ROUTE_ID);
 		String zkPath = Constant.Key.PATH_ROOT + "/" + siteCode + "/" + serviceCode;
 		String registerInfo = _zookeeperService.getData(zkPath);
 		//要比较传进来的调用参数和注册的调用参数数目和key是否一致

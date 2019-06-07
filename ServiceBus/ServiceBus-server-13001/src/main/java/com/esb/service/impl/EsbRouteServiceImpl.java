@@ -17,6 +17,7 @@ import com.esb.core.BaseRes;
 import com.esb.dao.EsbRouteDao;
 import com.esb.entity.EsbRouteEntity;
 import com.esb.service.EsbRouteService;
+import com.esb.sys.RegisterType;
 import com.esb.util.Constant;
 import com.esb.util.FileUtil;
 /**
@@ -69,7 +70,9 @@ public class EsbRouteServiceImpl extends BaseRes implements EsbRouteService {
 			return;
 		}
 		
-		if(endpointURI.startsWith("cxf")) {
+		Integer type = (Integer) routes.get(0).get(Constant.Key.ROUTE_TYPE);
+		
+		if(type == RegisterType.WEBSERVICE.getValue()) {
 			//要删除class
 			String siteCode = (String) routes.get(0).get(Constant.Key.SITE_CODE);
 			String serviceCode = (String) routes.get(0).get(Constant.Key.SERVICE_CODE);
