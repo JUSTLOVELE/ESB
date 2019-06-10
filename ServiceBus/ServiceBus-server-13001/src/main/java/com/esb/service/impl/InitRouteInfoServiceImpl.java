@@ -21,7 +21,7 @@ import com.esb.service.process.LastSoapRouteProcessor;
 import com.esb.service.process.LastWsRouteProcessor;
 import com.esb.service.route.RouteUtil;
 import com.esb.sys.InvokeDataType;
-import com.esb.sys.RegisterType;
+import com.esb.sys.InvokeType;
 import com.esb.util.Constant;
 import com.esb.util.UUIDUtil;
 import com.esb.util.XMLUtil;
@@ -93,7 +93,7 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			}
 		});
 		
-		saveRoute(routeId, uri, createUserOpId, siteCode, serviceCode, RegisterType.HTTP.getValue());
+		saveRoute(routeId, uri, createUserOpId, siteCode, serviceCode, InvokeType.HTTP.getValue());
 	
 	}
 	
@@ -135,7 +135,7 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			}
 		});
 		
-		saveRoute(routeId, cxfEndpoint.getEndpointUri(), createUserOpId, siteCode, serviceCode, RegisterType.WEBSERVICE.getValue());
+		saveRoute(routeId, cxfEndpoint.getEndpointUri(), createUserOpId, siteCode, serviceCode, InvokeType.WEBSERVICE.getValue());
 	}
 	
 	private void addHttp(String route, String routeId, String url, String siteCode, String serviceCode, String createUserOpId) throws Exception {
@@ -155,7 +155,7 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			}
 		});
 		
-		saveRoute(routeId, url + "?bridgeEndpoint=true&throwExceptionOnFailure=false", createUserOpId, siteCode, serviceCode, RegisterType.HTTP.getValue());
+		saveRoute(routeId, url + "?bridgeEndpoint=true&throwExceptionOnFailure=false", createUserOpId, siteCode, serviceCode, InvokeType.HTTP.getValue());
 	}
 	
 	private void addRoute(String route, String routeId, String data, String siteCode, String serviceCode) throws Exception {
@@ -165,7 +165,7 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 		String url = (String) registerInfo.get(Constant.Key.URL);
 		String createUserOpId = (String) registerInfo.get(Constant.Key.CREATEUSEROPID);
 		
-		switch (RegisterType.getValue(type)) {
+		switch (InvokeType.getValue(type)) {
 		case HTTP:
 			addHttp(route, routeId, url, siteCode, serviceCode, createUserOpId);
 			break;

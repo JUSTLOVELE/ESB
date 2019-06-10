@@ -95,6 +95,7 @@ public class LastSoapRouteProcessor implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		// 获取zookeeper资源
 		Message in = exchange.getIn();
+		in.setHeader(Exchange.CONTENT_TYPE, "text/xml");
 		Map<String, Object> head = in.getHeaders();
 		//Map<String, Object> esbHeadInvoke = (Map<String, Object>) head.get(Constant.Key.ESB_HEAD_INVOKE);
 		String siteCode = head.get(Constant.HeadParam.ESB_SITE_CODE).toString();

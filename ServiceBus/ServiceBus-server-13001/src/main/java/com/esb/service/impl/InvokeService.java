@@ -1,8 +1,14 @@
 package com.esb.service.impl;
 
 
+import java.io.ByteArrayOutputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.CreateMode;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +16,7 @@ import com.esb.core.Base;
 import com.esb.entity.EsbUserEntity;
 import com.esb.service.EsbRouteService;
 import com.esb.service.route.RouteUtil;
+import com.esb.sys.InvokeType;
 import com.esb.util.Constant;
 import com.esb.util.XMLUtil;
 
@@ -30,6 +37,8 @@ public class InvokeService extends Base{
 	
 	@Autowired
 	private EsbRouteService _esbRouteService;
+	
+	private final static Log _logger = LogFactory.getLog(InvokeService.class);
 	
 	/**
 	 * 删除ESB服务
@@ -92,10 +101,17 @@ public class InvokeService extends Base{
 			return returnErrorCode("type为必填");
 		}
 		
+		int type = json.getInt(Constant.Key.TYPE);
+		
+		if(type == InvokeType.SOAP.getValue()) {
+			
+			if(!json.containsKey(Constant.Key.SOAP)) {
+				return returnErrorCode("type=3,soap为必填项目");
+			}
+		}
+		
 		String siteCode = json.getString(Constant.Key.SITE_CODE);
 		String serviceCode = json.getString(Constant.Key.SERVICE_CODE);
-		//String url = json.getString(Constant.Key.URL);
-		//int type = json.getInt(Constant.Key.TYPE);
 		param = XMLUtil.parseJSONToRegisterXMLInfo(json, user);
 		String sitePath = RouteUtil.getSitePath(siteCode);
 		
@@ -140,6 +156,18 @@ public class InvokeService extends Base{
 			return returnErrorCode("type为必填");
 		}
 		
+		int type = Integer.valueOf(typeCodeElement.getValue());
+		Element soapElement = null;
+		
+		if(type == InvokeType.SOAP.getValue()) {
+			
+			soapElement = rootElement.getChild(Constant.Key.SOAP);
+			
+			if(soapElement == null || soapElement.getValue() == null || "".equals(soapElement.getValue())) {
+				return returnErrorCode("type=3时,soap必填");
+			}
+		}
+		
 		Element registerTypeElement = new Element("registerType");
 		registerTypeElement.setText("2");
 		Element createUserOpIdElement = new Element("createUserOpId");
@@ -158,9 +186,25 @@ public class InvokeService extends Base{
 		}
 		
 		String path = RouteUtil.getServicePath(siteCode, serviceCode);
+		Format format = Format.getCompactFormat();
+	    format.setEncoding("UTF-8");
+		XMLOutputter xmlout = new XMLOutputter(format);
+		ByteArrayOutputStream bo = new ByteArrayOutputStream();
+		String xml = null;
+		
+		try {
+			xmlout.output(rootElement, bo);
+			xml = bo.toString().trim();
+		} catch (Exception e) {
+			_logger.error("", e);
+		}
+		
+		if(xml == null) {
+			return returnErrorCode("xml转换失败");
+		}
 		
 		if(!_zookeeperService.checkExists(path)) {
-			_zookeeperService.createNode(path, CreateMode.PERSISTENT, rootElement.toString());
+			_zookeeperService.createNode(path, CreateMode.PERSISTENT, xml);
 		}else {
 			_zookeeperService.updateNodeDate(path, rootElement.toString());
 		}

@@ -17,7 +17,7 @@ import com.esb.core.BaseRes;
 import com.esb.dao.EsbRouteDao;
 import com.esb.entity.EsbRouteEntity;
 import com.esb.service.EsbRouteService;
-import com.esb.sys.RegisterType;
+import com.esb.sys.InvokeType;
 import com.esb.util.Constant;
 import com.esb.util.FileUtil;
 /**
@@ -72,7 +72,7 @@ public class EsbRouteServiceImpl extends BaseRes implements EsbRouteService {
 		
 		Integer type = (Integer) routes.get(0).get(Constant.Key.ROUTE_TYPE);
 		
-		if(type == RegisterType.WEBSERVICE.getValue()) {
+		if(type == InvokeType.WEBSERVICE.getValue()) {
 			//要删除class
 			String siteCode = (String) routes.get(0).get(Constant.Key.SITE_CODE);
 			String serviceCode = (String) routes.get(0).get(Constant.Key.SERVICE_CODE);

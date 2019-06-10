@@ -14,6 +14,7 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
 import com.esb.entity.EsbUserEntity;
+import com.esb.sys.InvokeType;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -120,6 +121,11 @@ public class XMLUtil {
 		sb.append("<createUserOpId>" + user.getOpId() + "</createUserOpId>");
 		sb.append("<type><![CDATA[" + json.getInt(Constant.Key.TYPE) + "]]></type>");
 		sb.append("<registerType>1</registerType>");
+		int type = json.getInt(Constant.Key.TYPE);
+		
+		if(type == InvokeType.SOAP.getValue()) {
+			sb.append("<soap><![CDATA[" + json.getString(Constant.Key.SOAP) + "]]></soap>");
+		}
 		
 		if(json.containsKey(Constant.Key.PARAMS)) {
 			
@@ -138,7 +144,6 @@ public class XMLUtil {
 		}
 
 		sb.append("</root>");
-		
 		return sb.toString();
 	}
 }

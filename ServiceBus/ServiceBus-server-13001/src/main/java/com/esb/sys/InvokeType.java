@@ -7,7 +7,7 @@ package com.esb.sys;
  * @version 1.00.00
  * @history:
  */
-public enum RegisterType {
+public enum InvokeType {
 
 	HTTP(1, "HTTP"),
 	WEBSERVICE(2, "webservice"),
@@ -17,16 +17,16 @@ public enum RegisterType {
 	
 	private String text;
 	
-	RegisterType(int value, String text){
+	InvokeType(int value, String text){
 		
 		this.value = value;
 		this.text = text;
 	}
 	
 
-	public static RegisterType getValue(int v) {
+	public static InvokeType getValue(int v) {
 		
-		for(RegisterType r: values()) {
+		for(InvokeType r: values()) {
 			
 			if(r.getValue() == v) {
 				return r;
