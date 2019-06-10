@@ -224,7 +224,6 @@ public class InvokeJsomTest extends Base{
 			p2.put("value", "nibacaocao");
 			params.add(p2);
 			map.put("params", params);
-			
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			//HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
 			HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");

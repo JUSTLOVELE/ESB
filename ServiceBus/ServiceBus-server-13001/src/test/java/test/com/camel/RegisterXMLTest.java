@@ -44,7 +44,6 @@ public class RegisterXMLTest {
 			sb.append("<value><![CDATA[BBB]]></value>");
 			sb.append("</param>");
 			sb.append("</root>");
-			
 			String param = sb.toString();
 			System.out.println(param);
 			CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -52,9 +51,7 @@ public class RegisterXMLTest {
 			String token = "test" + Constant.SPLIT_SIGN + "123456";
 			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
 			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
-			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
 			StringEntity entity = new StringEntity("param=" + param, "utf-8");
-          //  entity.setContentType("application/json;charset=UTF-8");
             entity.setContentEncoding("utf-8");
             entity.setContentType("application/x-www-form-urlencoded");  
 	        post.setEntity(entity);
