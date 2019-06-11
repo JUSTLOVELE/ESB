@@ -1,2 +1,5 @@
-# ESB
-link email: 694105388@qq.com
+服务总线，目前提供http,webservice,soap三种形式的调用;文件和图片要转为二进制再进行传输， 
+目前服务总线采用两级的接口即site/service,site code是指站点，service是指某个站点下面的具体服务器，显然site/service路径是唯一的。  
+注册服务和调用服务都支持json格式和xml格式的调用,以哪种格式调用就以哪种格式返回  
+删除服务仅支持json格式调用  
+用户注册时普通的http调用  
