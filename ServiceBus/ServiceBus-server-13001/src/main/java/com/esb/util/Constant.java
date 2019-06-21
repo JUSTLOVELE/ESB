@@ -94,6 +94,8 @@ public class Constant {
 		public String CONSUME_ACTIVEMQ_NORMAL = "consume_activemq_normal";
 		/**http上传请求来后的路由,消息格式為json**/
 		public String HTTP_START_UPLOAD_JSON_ID = "http_start_upload_json_id";
+		/**http上传请求来后的路由,消息格式為json**/
+		public String HTTP_START_UPLOAD_XML_ID = "http_start_upload_xml_id";
 	}
 
 

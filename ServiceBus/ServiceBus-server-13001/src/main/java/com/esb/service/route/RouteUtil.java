@@ -5,6 +5,8 @@ import com.esb.util.Constant;
 public class RouteUtil {
 	/**上传文件,图片专用**/
 	public final static String HTTP_INVOKE_UPLOAD_JSON_ADDRESS = "jetty:http://0.0.0.0:13002/ESB/invokeAction/invokeUploadWithJson";
+	/**上传文件,图片专用**/
+	public final static String HTTP_INVOKE_UPLOAD_XML_ADDRESS = "jetty:http://0.0.0.0:13002/ESB/invokeAction/invokeUploadWithXML";
 	
 	public final static String HTTP_INVOKE_JSON_ADDRESS = "jetty:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson";
 	

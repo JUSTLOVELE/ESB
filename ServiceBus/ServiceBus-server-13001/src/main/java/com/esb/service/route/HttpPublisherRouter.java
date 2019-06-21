@@ -59,6 +59,10 @@ public class HttpPublisherRouter extends RouteBuilder {
 		.process(_startUploadHttpProcessor)
 		.dynamicRouter(method(_dynamicRouter, "routeByPriority"));
 		
+		from(RouteUtil.HTTP_INVOKE_UPLOAD_XML_ADDRESS)
+		.routeId(Constant.RouteId.HTTP_START_UPLOAD_XML_ID)
+		.process(_startUploadHttpProcessor)
+		.dynamicRouter(method(_dynamicRouter, "routeByPriority"));
 		
 		/*from(RouteUtil.HTTP_INVOKE_UPLOAD_JSON_ADDRESS)
 		.routeId(Constant.RouteId.HTTP_START_UPLOAD_JSON_ID)
