@@ -3,14 +3,16 @@ package com.esb.service.route;
 import com.esb.util.Constant;
 
 public class RouteUtil {
+	/**上传文件,图片专用**/
+	public final static String HTTP_INVOKE_UPLOAD_JSON_ADDRESS = "jetty:http://0.0.0.0:13002/ESB/invokeAction/invokeUploadWithJson";
 	
-	public final static String HTTP_INVOKE_JSON_ADDRESS = "netty4-http:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson";
+	public final static String HTTP_INVOKE_JSON_ADDRESS = "jetty:http://0.0.0.0:13002/ESB/invokeAction/invokeWithJson";
 	
-	public final static String HTTP_INVOKE_XML_ADDRESS = "netty4-http:http://0.0.0.0:13002/ESB/invokeAction/invokeWithXML";
+	public final static String HTTP_INVOKE_XML_ADDRESS = "jetty:http://0.0.0.0:13002/ESB/invokeAction/invokeWithXML";
 	/**普通消费者**/
 	public final static String invokeNormalQueueEndpointConsume = "activemq:esb.normal.invokeNormalQueue?concurrentConsumers=5&maxConcurrentConsumers=5";
 	/**高速消费者**/
-	public final static String invokeHighQueueEndpointConsume = "activemq:esb.high.invokHighQueue?concurrentConsumers=10&maxConcurrentConsumers=10";
+	public final static String invokeHighQueueEndpointConsume = "activemq:esb.high.invokHighQueue?concurrentConsumers=10&maxConcurrentConsumers=10t";
 	/**普通生产者**/
 	public final static String invokeNormalEndpointProduce = "activemq:esb.normal.invokeNormalQueue?concurrentConsumers=2&maxConcurrentConsumers=2&requestTimeout=60000";
 	/**高速生产者**/

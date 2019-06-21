@@ -36,24 +36,6 @@ public class InvokeAction extends Base{
 	
 	private final static Log _logger = LogFactory.getLog(InvokeAction.class);
 	
-	private EsbUserEntity getUser(String token) {
-		
-		token = RSA.decryptByPrivate(token, Constant.Constant_PRIVATE_KEY);
-		
-		if(token == null || "".equals(token)) {
-			throw new RuntimeException("token错误");
-		}
-		
-		String[] array = token.split(Constant.SPLIT_SIGN);
-		
-		if(array == null || array.length != 2) {
-			throw new RuntimeException("密码格式错误导致token解析失败");
-		}
-		
-		EsbUserEntity user = _userService.userLogin(array[0], array[1]);
-		return user;
-	}
-	
 	@ResponseBody
 	@RequestMapping(value="/removeESBService", produces="application/json; charset=utf-8")
 	public String removeESBService(String param, HttpServletRequest request) {
@@ -118,5 +100,23 @@ public class InvokeAction extends Base{
 		}
 		
 		return _invokeService.registerWithXML(param, user);
+	}
+	
+	private EsbUserEntity getUser(String token) {
+		
+		token = RSA.decryptByPrivate(token, Constant.Constant_PRIVATE_KEY);
+		
+		if(token == null || "".equals(token)) {
+			throw new RuntimeException("token错误");
+		}
+		
+		String[] array = token.split(Constant.SPLIT_SIGN);
+		
+		if(array == null || array.length != 2) {
+			throw new RuntimeException("密码格式错误导致token解析失败");
+		}
+		
+		EsbUserEntity user = _userService.userLogin(array[0], array[1]);
+		return user;
 	}
 }

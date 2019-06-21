@@ -19,6 +19,56 @@ import com.esb.util.encrypt.RSA;
 
 public class RegisterJsonTest extends Base{
 	
+	/**
+	 * 文件上传注册
+	 */
+	@Test
+	public void registerWithtwoParamJsonFileUpload() {
+		
+		try {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put(Constant.Key.SITE_CODE, "350004");
+			map.put(Constant.Key.SERVICE_CODE, "SinglefileUpload");
+			map.put(Constant.Key.URL, "http://localhost:8080/ESBTest/testAction/fileTest");
+			map.put(Constant.Key.TYPE, 4);
+			List<Map<String, Object>> params = new ArrayList<Map<String, Object>>();
+			Map<String, Object> p = new HashMap<String, Object>();
+			p.put("key", "arg0");
+			p.put("type", 1);
+			params.add(p);
+			Map<String, Object> p1 = new HashMap<String, Object>();
+			p1.put("key", "arg1");
+			p1.put("type", 1);
+			params.add(p1);
+			Map<String, Object> p2 = new HashMap<String, Object>();
+			p2.put("key", "file");
+			p2.put("type", 2);
+			params.add(p2);
+			map.put(Constant.Key.PARAMS, params);
+			String param = getJSON(map);
+			System.out.println(param);
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			String token = "test" + Constant.SPLIT_SIGN + "123456";
+			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
+			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
+			//HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeWithJson");
+			StringEntity entity = new StringEntity("param=" + param, "utf-8");
+          //  entity.setContentType("application/json;charset=UTF-8");
+            entity.setContentEncoding("utf-8");
+            entity.setContentType("application/x-www-form-urlencoded");  
+	        post.setEntity(entity);
+	        HttpResponse httpResponse = httpClient.execute(post);
+	        httpResponse.setHeader("Content-Type", "text/plain;charset=utf-8");
+	        String s = EntityUtils.toString(httpResponse.getEntity(), "utf-8");
+	        System.out.println(s);
+	        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Test
 	public void userRegister() {
 		

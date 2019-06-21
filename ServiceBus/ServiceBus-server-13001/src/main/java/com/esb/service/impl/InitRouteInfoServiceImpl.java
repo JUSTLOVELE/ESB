@@ -18,6 +18,7 @@ import com.esb.service.InitRouteInfoService;
 import com.esb.service.process.EndRouteProcessor;
 import com.esb.service.process.LastHttpRouteProcessor;
 import com.esb.service.process.LastSoapRouteProcessor;
+import com.esb.service.process.LastUploadHttpProcessor;
 import com.esb.service.process.LastWsRouteProcessor;
 import com.esb.service.route.RouteUtil;
 import com.esb.sys.InvokeDataType;
@@ -46,6 +47,9 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 	private LastHttpRouteProcessor _lastHttpRouteProcessor;
 	
 	@Autowired
+	private LastUploadHttpProcessor _lastUoloadHttpProcessor;
+	
+	@Autowired
 	private EsbWsService _esbWsService;
 	
 	@Autowired
@@ -64,6 +68,26 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 		EsbRouteEntity e = new EsbRouteEntity(UUIDUtil.getUUID(), routeId, endpointUri, createUserOpId, siteCode, serviceCode);
 		e.setRouteType(type);
 		_esbRouteService.saveEsbRouteEntity(e);
+	}
+	//route, routeId, url, siteCode, serviceCode, createUserOpId
+	private void addUpload(String route, String routeId, String url, String siteCode, String serviceCode, String createUserOpId) throws Exception {
+		
+		_logger.info("addUpload = " + routeId);
+		removeCamelEndPoint(routeId);
+		_camelContext.addRoutes(new RouteBuilder() {
+			
+			@Override
+			public void configure() throws Exception {
+				
+				errorHandler(deadLetterChannel("bean:routerErrorHandler?method=handlerHttpSiteRoute"));
+				from(route).routeId(routeId)
+				.process(_lastUoloadHttpProcessor)
+				.to(ExchangePattern.InOut, url + "?bridgeEndpoint=true&throwExceptionOnFailure=false")
+				.process(_endRouteProcessor).end();
+			}
+		});
+		
+		saveRoute(routeId, url + "?bridgeEndpoint=true&throwExceptionOnFailure=false", createUserOpId, siteCode, serviceCode, InvokeType.HTTP.getValue());
 	}
 	
 	private void addSoap(String route, String routeId, String wsdlAddress, String siteCode, String serviceCode, String createUserOpId) throws Exception {
@@ -176,6 +200,9 @@ public class InitRouteInfoServiceImpl implements InitRouteInfoService {
 			
 		case SOAP:
 			addSoap(route, routeId, url, siteCode, serviceCode, createUserOpId);
+			break;
+		case UPLOAD:
+			addUpload(route, routeId, url, siteCode, serviceCode, createUserOpId);
 			break;
 			
 		default:

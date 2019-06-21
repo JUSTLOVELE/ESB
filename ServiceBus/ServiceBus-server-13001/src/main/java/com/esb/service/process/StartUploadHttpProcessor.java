@@ -1,5 +1,7 @@
 package com.esb.service.process;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,16 +33,12 @@ import net.sf.json.JSONObject;
  * @history:
  */
 @Component
-public class StartHttpProcessor implements Processor{
-	
-	private final static Log _logger = LogFactory.getLog(StartHttpProcessor.class);
+public class StartUploadHttpProcessor implements Processor {
+
+	private final static Log _logger = LogFactory.getLog(StartUploadHttpProcessor.class);
 	
 	@Autowired
 	private UserService _userService;
-	
-	public StartHttpProcessor() {
-		
-	}
 	
 	/**
 	 * 处理xml数据,并将对应的数据保存到head参数中
@@ -53,6 +51,7 @@ public class StartHttpProcessor implements Processor{
 		Element siteCodeElement = root.getChild(Constant.Key.SITE_CODE);
 		Element serviceCodeElement = root.getChild(Constant.Key.SERVICE_CODE);
 		Element offlineElement = root.getChild(Constant.Key.OFFLINE);
+		Element filesElement = root.getChild(Constant.Key.FILES);
 		
 		if(siteCodeElement == null || siteCodeElement.getValue() == null || "".equals(siteCodeElement.getValue())) {
 			throw new RuntimeCamelException("orgCode为必填项");
@@ -64,6 +63,10 @@ public class StartHttpProcessor implements Processor{
 		
 		if(offlineElement == null || offlineElement.getValue() == null || "".equals(offlineElement.getValue())) {
 			throw new RuntimeCamelException("serviceCode为必填项");
+		}
+		
+		if(filesElement == null) {
+			throw new RuntimeCamelException("文件参数为不能为空");
 		}
 		
 		head.put(Constant.HeadParam.ESB_SITE_CODE, siteCodeElement.getValue());
@@ -101,69 +104,92 @@ public class StartHttpProcessor implements Processor{
 			throw new RuntimeCamelException("offline为不能为空");
 		}
 		
+		if(!json.containsKey(Constant.Key.FILES)) {
+			throw new RuntimeCamelException("文件参数为不能为空");
+		}
+		
 		head.put(Constant.HeadParam.ESB_SITE_CODE, json.getString(Constant.Key.SITE_CODE));
 		head.put(Constant.HeadParam.ESB_SERVICE_CODE, json.getString(Constant.Key.SERVICE_CODE));
 		head.put(Constant.HeadParam.ESB_OFFLINE, json.getString(Constant.Key.OFFLINE));
 		head.put(Constant.HeadParam.ESB_INVOKE_DATA_TYPE, InvokeDataType.JSON.getValue());
 	}
 
+
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		//验证用户
+		// 验证用户
 		Message in = exchange.getIn();
 		Map<String, Object> head = in.getHeaders();
 		String token = (String) head.get(Constant.HeadParam.AUTHORIZATION);
 		token = RSA.decryptByPrivate(token, Constant.Constant_PRIVATE_KEY);
-		
-		if(token == null || "".equals(token)) {
+
+		if (token == null || "".equals(token)) {
 			throw new RuntimeCamelException("token错误");
 		}
-		
+
 		String[] array = token.split(Constant.SPLIT_SIGN);
-		
-		if(array == null || array.length != 2) {
+
+		if (array == null || array.length != 2) {
 			throw new RuntimeCamelException("密码格式错误导致token解析失败");
 		}
-		
+
 		EsbUserEntity user = _userService.userLogin(array[0], array[1]);
-		
-		if(user == null) {
+
+		if (user == null) {
 			throw new RuntimeCamelException("登录失败");
 		}
-		
-		//-----------------------------
-		//Map<String, Object> esbHeadInvoke = new HashMap<String, Object>();
-		//因为没有做用户的等级所有固定放1,意味着只走普通队列
+
+		// -----------------------------
+		// Map<String, Object> esbHeadInvoke = new HashMap<String, Object>();
+		// 因为没有做用户的等级所有固定放1,意味着只走普通队列
 		head.put(Constant.HeadParam.ESB_COUNT_ROUTE_PRIORITY, user.getUserLevel());
 		head.put(Constant.HeadParam.ESB_IS_INVOKE, Boolean.valueOf(false));
 		head.put(Constant.HeadParam.ESB_USER_EMAIL, user.getUserEmail());
 		head.put(Constant.HeadParam.ESB_USER_ID, user.getUserId());
 		head.put(Constant.HeadParam.ESB_USER_OP_ID, user.getOpId());
 		head.put(Constant.HeadParam.ESB_USER_PHONE, user.getUserPhone());
-		
+
 		String method = head.get(Exchange.HTTP_METHOD).toString();
 		String data = null;
-		
-		if(Constant.Key.POST.equals(method)) {
-			data = exchange.getIn().getBody(String.class);
-		}else if(Constant.Key.GET.equals(method)) {
+
+		if (Constant.Key.POST.equals(method)) {
+			data = (String) head.get(Constant.Key.PARAM);
+		} else if (Constant.Key.GET.equals(method)) {
 			String queryString = head.get(Exchange.HTTP_QUERY).toString();
-			Map<String, String> map = Stream.of(queryString.split("&")).map(obj -> obj.split("=")).collect(Collectors.toMap(entry -> entry[0], entry -> entry[1]));
+			Map<String, String> map = Stream.of(queryString.split("&")).map(obj -> obj.split("="))
+					.collect(Collectors.toMap(entry -> entry[0], entry -> entry[1]));
 			data = map.get(Constant.Key.PARAM);
-			 
-		}else {
+
+		} else {
 			throw new RuntimeCamelException("method既不是post也不是get");
 		}
-		
+
 		_logger.info(("data = " + data));
+		head.put(Constant.Key.PARAM, data);
 		String routeId = exchange.getFromRouteId();
+		InputStream inputStream = exchange.getIn().getAttachment(Constant.Key.FILE).getInputStream();
 		
-		if(routeId.contains(Constant.Key.JSON)) {
+		if(inputStream == null) {
+			throw new RuntimeCamelException("没有找到文件");
+		}
+		
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		int rc = 0; 
+		byte[] buff = new byte[100];
+		while ((rc = inputStream.read(buff, 0, 100)) > 0) {
+			byteArrayOutputStream.write(buff, 0, rc);  
+		}
+
+		byte[] b = byteArrayOutputStream.toByteArray();
+		exchange.getIn().setBody(b);
+		
+		if (routeId.contains(Constant.Key.JSON)) {
 			handlerJSONData(data, head);
-		}else if(routeId.contains(Constant.Key.XML)){
+		} else if (routeId.contains(Constant.Key.XML)) {
 			handlerXMLData(data, head);
-		}else {
+		} else {
 			throw new RuntimeCamelException("未知路由ID:" + routeId);
 		}
+
 	}
 }

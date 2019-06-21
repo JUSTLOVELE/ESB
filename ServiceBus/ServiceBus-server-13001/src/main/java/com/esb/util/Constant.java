@@ -92,6 +92,8 @@ public class Constant {
 		public String PRODUCE_ACTIVEMQ_HIGH = "produce_activemq_high";
 		/**消费者普通队列**/
 		public String CONSUME_ACTIVEMQ_NORMAL = "consume_activemq_normal";
+		/**http上传请求来后的路由,消息格式為json**/
+		public String HTTP_START_UPLOAD_JSON_ID = "http_start_upload_json_id";
 	}
 
 
@@ -143,6 +145,8 @@ public class Constant {
 		
 		public String PARAMS = "params";
 		
+		public String FILES = "files";
+		
 		public String POST = "POST";
 		
 		public String GET = "GET";
@@ -157,11 +161,17 @@ public class Constant {
 		
 		public String VALUE = "value";
 		
+		public String FILE_NAME = "fileName";
+		
+		public String FILE_TYPE = "fileType";
+		
 		public String USER_NAME = "userName";
 		
 		public String PASSWORD = "password";
 		
 		public String TOKEN = "token";
+		
+		public String FILE = "file";
 	}
 	
 	//本地配置文件

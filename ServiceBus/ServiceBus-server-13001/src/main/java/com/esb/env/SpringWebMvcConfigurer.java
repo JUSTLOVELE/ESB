@@ -10,7 +10,6 @@ import org.springframework.validation.MessageCodesResolver;
 import org.springframework.validation.Validator;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
@@ -47,15 +46,15 @@ public class SpringWebMvcConfigurer implements WebMvcConfigurer {
 		//registry.addInterceptor(new ProcessorInterceptors()).addPathPatterns("/**");
 	}
 	
-	@Bean
-	public CommonsMultipartResolver commonsMultipartResolver() {
-		
-		CommonsMultipartResolver c = new CommonsMultipartResolver();
-		c.setMaxUploadSize(10240000);
-		c.setMaxInMemorySize(4096);
-		c.setDefaultEncoding("utf-8");
-		return c;
-	}
+//	@Bean
+//	public CommonsMultipartResolver commonsMultipartResolver() {
+//		
+//		CommonsMultipartResolver c = new CommonsMultipartResolver();
+//		c.setMaxUploadSize(10240000);
+//		c.setMaxInMemorySize(4096);
+//		c.setDefaultEncoding("utf-8");
+//		return c;
+//	}
 	
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {

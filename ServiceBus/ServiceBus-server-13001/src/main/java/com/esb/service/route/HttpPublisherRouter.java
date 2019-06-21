@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.esb.service.process.StartHttpProcessor;
+import com.esb.service.process.StartUploadHttpProcessor;
 import com.esb.util.Constant;
 
 /**
@@ -27,6 +28,9 @@ public class HttpPublisherRouter extends RouteBuilder {
 	
 	@Autowired
 	private StartHttpProcessor _startHttpProcessor;
+	
+	@Autowired
+	private StartUploadHttpProcessor _startUploadHttpProcessor;
 	
 	/**
 	 * 
@@ -49,6 +53,29 @@ public class HttpPublisherRouter extends RouteBuilder {
 		from(RouteUtil.HTTP_INVOKE_XML_ADDRESS).routeId(Constant.RouteId.HTTP_START_XML_ID).process(_startHttpProcessor).dynamicRouter(method(_dynamicRouter, "routeByPriority"));
 		from(RouteUtil.Direct.DIRECT_PRODUCENORMAL).routeId(Constant.RouteId.PRODUCE_ACTIVEMQ_NORMAL).to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
 		from(RouteUtil.Direct.DIRECT_PRODUCEHIGH).routeId(Constant.RouteId.PRODUCE_ACTIVEMQ_HIGH).to(ExchangePattern.InOut, RouteUtil.invokeHighEndpointProduce);
+		//--------------upload-----------------------
+		from(RouteUtil.HTTP_INVOKE_UPLOAD_JSON_ADDRESS)
+		.routeId(Constant.RouteId.HTTP_START_UPLOAD_JSON_ID)
+		.process(_startUploadHttpProcessor)
+		.dynamicRouter(method(_dynamicRouter, "routeByPriority"));
+		
+		
+		/*from(RouteUtil.HTTP_INVOKE_UPLOAD_JSON_ADDRESS)
+		.routeId(Constant.RouteId.HTTP_START_UPLOAD_JSON_ID)
+		.process(_startUploadHttpProcessor)
+		.to(ExchangePattern.InOut, "http://localhost:8080/ESBTest/testAction/fileTest?bridgeEndpoint=true&throwExceptionOnFailure=false")
+		.process(new Processor() {
+			
+			@Override
+			public void process(Exchange exchange) throws Exception {
+				
+				String data = exchange.getIn().getBody(String.class);
+				exchange.getOut().setBody(data);
+			}
+		})
+		
+		;*/
+		
 		//to(ExchangePattern.InOut, RouteUtil.invokeNormalEndpointProduce);
 		/*_logger.info("----default cxf SpringBus:"+webServicePublisher.getBus());
 		

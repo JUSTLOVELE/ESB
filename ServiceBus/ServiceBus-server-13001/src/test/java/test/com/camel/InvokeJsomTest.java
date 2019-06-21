@@ -9,9 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -24,6 +26,54 @@ import com.esb.util.encrypt.RSA;
 import net.sf.json.JSONObject;
 
 public class InvokeJsomTest extends Base{
+	
+	/**
+	 * 三个参数调用加图片上传
+	 */
+	@Test
+	public void invokeWithThreeParamJsonImageTest() {
+		
+		try {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put(Constant.Key.SITE_CODE, "350004");
+			map.put(Constant.Key.SERVICE_CODE, "SinglefileUpload");
+			map.put(Constant.Key.OFFLINE, 0);
+			List<Map<String, Object>> params = new ArrayList<Map<String, Object>>();
+			Map<String, Object> p1 = new HashMap<String, Object>();
+			p1.put("key", "arg0");
+			p1.put("value", "nimacaocao");
+			params.add(p1);
+			Map<String, Object> p2 = new HashMap<String, Object>();
+			p2.put("key", "arg1");
+			p2.put("value", "nibacaocao");
+			params.add(p2);
+			map.put("params", params);
+			List<Map<String, Object>> files = new ArrayList<Map<String, Object>>();
+			Map<String, Object> fileMap = new HashMap<String, Object>();
+			fileMap.put("fileName", "test111.jpg");
+			fileMap.put("fileType", "jpg");
+			files.add(fileMap);
+			map.put("files", files);
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			//HttpPost post = new HttpPost("http://localhost:13001/ESB/invokeAction/registerWithJson");
+			HttpPost post = new HttpPost("http://localhost:13002/ESB/invokeAction/invokeUploadWithJson");
+			String token = "test" + Constant.SPLIT_SIGN + "123456";
+			String publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHDpXYwv93+kl5DKoMIkn4dAVY6Qtp7ra8BlANXtavEFZW1+z+c4gQoiXQW89y0DCFpvPZdDG/VyvxwghRE1a0CAwEAAQ==";
+			post.addHeader("Authorization", RSA.encryptByPublic(token, publicKeyStr));
+			File file = new File("D:/11.jpg");
+			HttpEntity entity = MultipartEntityBuilder.create()
+						.addTextBody("param", getJSON(map))
+						.addBinaryBody("file", file).build();
+		    post.setEntity(entity);
+			HttpResponse httpResponse = httpClient.execute(post);
+	        String s = EntityUtils.toString(httpResponse.getEntity(), "utf-8");
+	        System.out.println(s);
+	        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	@Test
 	public void invokeWithTwoParamJsonWebServiceTest() {

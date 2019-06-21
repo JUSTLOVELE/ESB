@@ -105,7 +105,7 @@ public class LastHttpRouteProcessor implements Processor{
 		//要比较传进来的调用参数和注册的调用参数数目和key是否一致
 		Map<String, Object> esbHeadRegister = XMLUtil.getReigsterInfo(registerInfo);
 		List<Map<String, Object>> registerParams = (List<Map<String, Object>>) esbHeadRegister.get(Constant.Key.PARAMS);
-		List<Map<String, Object>> invokeParams = getInvokeParams(Integer.valueOf(head.get(Constant.HeadParam.ESB_INVOKE_DATA_TYPE).toString()),
+		List<Map<String, Object>> invokeParams = getInvokeParams(Integer.valueOf(head.get(Constant.HeadParam.ESB_INVOKE_DATA_TYPE).toString()), 
 				in.getBody(String.class));
 		
 		if(registerParams == null && invokeParams != null) {
@@ -123,7 +123,6 @@ public class LastHttpRouteProcessor implements Processor{
 			}
 			
 			StringBuffer sb = new StringBuffer();
-			
 			
 			for(Map<String, Object> registerParam: registerParams) {
 				

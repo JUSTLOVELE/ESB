@@ -11,7 +11,8 @@ public enum InvokeType {
 
 	HTTP(1, "HTTP"),
 	WEBSERVICE(2, "webservice"),
-	SOAP(3, "soap")
+	SOAP(3, "soap"),
+	UPLOAD(4, "upload")
 	;
 	private int value;
 	
